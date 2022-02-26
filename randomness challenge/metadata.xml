@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+    <name>Randomness Challenge</name>
+    <directory>randomness challenge</directory>
+    <id>2765647569</id>
+    <description>I find that I tend to take the same path on most of my normal playthroughs. This mod tries to mix that up with random paths and characters.
+
+Path examples:
+[list]
+    [*]Mom -&gt; It Lives -&gt; Isaac
+    [*]Mom -&gt; It Lives -&gt; Satan -&gt; Mega Satan
+    [*]Mom -&gt; Mother -&gt; Hush -&gt; Delirium
+    [*]Ascent -&gt; The Beast
+[/list]
+
+You can tap the map button to show your path.
+
+None of the paths go past Mega Satan or The Beast, but if you use a mod like AlwaysVoid then you can continue on after Mega Satan if you want.
+
+I haven't seen a random Void portal show up in a custom challenge recently, but if one does then you can always choose to end your run by fighting Delirium.
+
+Right now, trapdoors spawn in the center of the room rather than their normal positions. I might leave this or change it. I haven't made up my mind yet. I like that it feels a bit different.
+
+If relevant: The polaroid and negative aren't required. Knife pieces 1 and 2 are required. Key pieces 1 and 2 will be spawned at the start of your run.
+
+There's 5 challenges that are based around character selection.
+
+[b][u]Randomness Challenge[/u][/b]
+
+This challenge will start you with a random character.
+[olist]
+    [*]Isaac
+    [*]Maggy
+    [*]Cain
+    [*]Judas
+    [*]Blue Baby
+    [*]Eve
+    [*]Samson
+    [*]Azazel
+    [*]Lazarus
+    [*]The Lost
+    [*]Lilith
+    [*]Keeper
+    [*]Apollyon
+    [*]The Forgotten
+    [*]Bethany
+    [*]Jacob and Esau
+[/olist]
+
+If you really want to start with a specific character then you can press the corresponding number(s) on your keyboard when starting the challenge. For example:
+[list]
+    [*]1 = Isaac
+    [*]0 = 10 = The Lost
+    [*]0 + 1 = 11 = Lilith
+[/list]
+
+[b][u]Randomness Challenge (Tainted)[/u][/b]
+
+This challenge will start you with a random tainted character from the list above.
+
+[b][u]Randomness Challenge (Eden)[/u][/b]
+
+Eden is already pretty random.
+
+[b][u]Randomness Challenge (T-Eden)[/u][/b]
+
+Tainted Eden is even more random.
+
+[b][u]Randomness Challenge (Trainer)[/u][/b]
+
+This challenge starts you as Isaac with TMTRAINER. It's basically the DELETE THIS challenge with a custom path.</description>
+    <version>1.1</version>
+    <visibility>Public</visibility>
+    <tag id="Lua"/>
+    <tag id="Challenges"/>
+</metadata>
