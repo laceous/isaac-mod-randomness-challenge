@@ -340,7 +340,7 @@ function mod:onPickupInit(pickup)
   local roomDesc = level:GetCurrentRoomDesc()
   local stage = level:GetStage()
   
-  if room:IsCurrentRoomLastBoss() or mod:isMother() or mod:isHush() and stage ~= LevelStage.STAGE7 then -- does not include mega satan, exclude the void
+  if (room:IsCurrentRoomLastBoss() or mod:isMother() or mod:isHush()) and stage ~= LevelStage.STAGE7 then -- does not include mega satan, exclude the void
     if mod.state.endingBoss.megasatan and stage == LevelStage.STAGE6 and room:GetType() == RoomType.ROOM_BOSS and roomDesc.GridIndex >= 0 then -- remove trophy from normal boss
       pickup:Remove()
     elseif mod.state.endingBoss.delirium and stage >= mod.state.endingBoss.endstage then -- at or past the ending stage (not counting the void)
