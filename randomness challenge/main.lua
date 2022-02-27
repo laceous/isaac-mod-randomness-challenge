@@ -116,51 +116,51 @@ function mod:onGameStart(isContinue)
   mod:setStageSeed(stageSeed)
   
   if isContinue then
+    local die = false
+    
     if mod:HasData() then
       local _, state = pcall(json.decode, mod:LoadData())
       
-      if type(state) == 'table' then
-        if type(state.stageSeeds) == 'table' then
-          -- quick check to see if this is the same run being continued
-          if state.stageSeeds[tostring(stage)] == stageSeed then
-            for key, value in pairs(state.stageSeeds) do
-              if type(key) == 'string' and math.type(value) == 'integer' then
-                mod.state.stageSeeds[key] = value
-              end
-            end
-            if math.type(state.defaultNumKeys) == 'integer' then
-              mod.state.defaultNumKeys = state.defaultNumKeys
-            end
-            if math.type(state.defaultNumBombs) == 'integer' then
-              mod.state.defaultNumBombs = state.defaultNumBombs
-            end
-            if math.type(state.defaultNumCoins) == 'integer' then
-              mod.state.defaultNumCoins = state.defaultNumCoins
-            end
-            if type(state.endingBoss) == 'table' then
-              if type(state.endingBoss.name) == 'string' and
-                 math.type(state.endingBoss.weight) == 'integer' and state.endingBoss.weight >= 0 and
-                 math.type(state.endingBoss.endstage) == 'integer' and state.endingBoss.endstage > LevelStage.STAGE_NULL and state.endingBoss.endstage < LevelStage.NUM_STAGES and
-                 type(state.endingBoss.altpath) == 'boolean' and
-                 type(state.endingBoss.secretpath) == 'boolean' and
-                 type(state.endingBoss.hush) == 'boolean' and
-                 type(state.endingBoss.megasatan) == 'boolean' and
-                 type(state.endingBoss.delirium) == 'boolean'
-              then
-                mod:setEndingBoss(state.endingBoss)
-              end
-            end
-          else
-            -- die so they can restart and get back to a good state
-            for i = 0, game:GetNumPlayers() - 1 do
-              local player = game:GetPlayer(i)
-              player:Die() -- Kill
-            end
+      if type(state) == 'table' and
+         type(state.stageSeeds) == 'table' and
+         state.stageSeeds[tostring(stage)] == stageSeed and -- quick check to see if this is the same run being continued
+         math.type(state.defaultNumKeys) == 'integer' and
+         math.type(state.defaultNumBombs) == 'integer' and
+         math.type(state.defaultNumCoins) == 'integer' and
+         type(state.endingBoss) == 'table' and
+         type(state.endingBoss.name) == 'string' and
+         math.type(state.endingBoss.weight) == 'integer' and state.endingBoss.weight >= 0 and
+         math.type(state.endingBoss.endstage) == 'integer' and state.endingBoss.endstage > LevelStage.STAGE_NULL and state.endingBoss.endstage < LevelStage.NUM_STAGES and
+         type(state.endingBoss.altpath) == 'boolean' and
+         type(state.endingBoss.secretpath) == 'boolean' and
+         type(state.endingBoss.hush) == 'boolean' and
+         type(state.endingBoss.megasatan) == 'boolean' and
+         type(state.endingBoss.delirium) == 'boolean'
+      then
+        for key, value in pairs(state.stageSeeds) do
+          if type(key) == 'string' and math.type(value) == 'integer' then
+            mod.state.stageSeeds[key] = value
           end
         end
+        mod.state.defaultNumKeys = state.defaultNumKeys
+        mod.state.defaultNumBombs = state.defaultNumBombs
+        mod.state.defaultNumCoins = state.defaultNumCoins
+        mod:setEndingBoss(state.endingBoss)
+      else
+        die = true
+      end
+    else
+      die = true
+    end
+    
+    if die then
+      -- die so they can restart and get back to a good state
+      for i = 0, game:GetNumPlayers() - 1 do
+        local player = game:GetPlayer(i)
+        player:Die() -- Kill
       end
     end
-  else
+  else -- not continue
     local weightedEndingBosses = {}
     for _, endingBoss in ipairs(mod.endingBosses) do
       for i = 1, endingBoss.weight do
@@ -270,11 +270,11 @@ function mod:onNewRoom()
        )
     then
       mod:spawnTrapdoor(room:GetCenterPos()) -- trapdoors will stick around
-    elseif mod.state.endingBoss.delirium and room:IsClear() and mod:isHush() then -- re-entering hush room after clearing
+    elseif mod.state.endingBoss.delirium and room:IsClear() and mod:isHush() then -- re-enter hush room after clearing
       mod:spawnTheVoidDoor() -- doors have to be re-spawned every time
     elseif mod.state.endingBoss.megasatan and stage == LevelStage.STAGE6 and roomDesc.GridIndex == level:GetStartingRoomIndex() then -- spawn mega satan door in first room
       mod:spawnMegaSatanRoomDoor()
-    elseif room:IsClear() and room:IsCurrentRoomLastBoss() and mod:hasMoreStagesToGo() then -- re-entering boss room after clearing
+    elseif room:IsClear() and room:IsCurrentRoomLastBoss() and mod:hasMoreStagesToGo() then -- re-enter boss room after clearing
       if mod:shouldSpawnBlueWombDoor() then
         mod:spawnBlueWombDoor()
       elseif mod:shouldSpawnSecretExit() then
