@@ -306,6 +306,10 @@ function mod:onRender()
     return
   end
   
+  if game:IsPaused() then
+    return
+  end
+  
   for i = 0, game:GetNumPlayers() - 1 do
     local player = game:GetPlayer(i)
     if Input.IsActionTriggered(ButtonAction.ACTION_MAP, player.ControllerIndex) then
