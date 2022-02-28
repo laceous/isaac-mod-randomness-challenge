@@ -319,6 +319,29 @@ function mod:onRender()
   end
 end
 
+function mod:onPreEntitySpawn(entityType, variant, subType, position, velocity, spawner, seed)
+  if not mod:isChallenge() then
+    return
+  end
+  
+  local room = game:GetRoom()
+  
+  -- there's options doesn't seem to work in the mom boss room in challenges so we don't need to worry about different positioning
+  if entityType == EntityType.ENTITY_PICKUP and variant == PickupVariant.PICKUP_COLLECTIBLE and position.X == 320 and position.Y == 360 and spawner == nil and room:IsClear() and mod:isMom() and not game:GetStateFlag(GameStateFlag.STATE_MAUSOLEUM_HEART_KILLED) then
+    if mod.state.endingBoss.endstage == LevelStage.STAGE5 or mod.state.endingBoss.endstage == LevelStage.STAGE6 then
+      if mod.state.endingBoss.altpath then
+        if not mod:hasCollectible(CollectibleType.COLLECTIBLE_POLAROID) then
+          return { entityType, variant, CollectibleType.COLLECTIBLE_POLAROID, seed } -- isaac/blue baby
+        end
+      else -- not altpath
+        if not mod:hasCollectible(CollectibleType.COLLECTIBLE_NEGATIVE) then
+          return { entityType, variant, CollectibleType.COLLECTIBLE_NEGATIVE, seed } -- satan/the lamb
+        end
+      end
+    end
+  end
+end
+
 -- filtered to ENTITY_MOTHER
 -- prevents delirium from transforming into mother (instantly killing her)
 function mod:onNpcInit(entityNpc)
@@ -531,8 +554,13 @@ end
 
 function mod:addKeyPieces()
   local player = game:GetPlayer(0)
-  player:AddCollectible(CollectibleType.COLLECTIBLE_KEY_PIECE_1, 0, true, ActiveSlot.SLOT_PRIMARY, 0)
-  player:AddCollectible(CollectibleType.COLLECTIBLE_KEY_PIECE_2, 0, true, ActiveSlot.SLOT_PRIMARY, 0)
+  
+  if not mod:hasCollectible(CollectibleType.COLLECTIBLE_KEY_PIECE_1) then
+    player:AddCollectible(CollectibleType.COLLECTIBLE_KEY_PIECE_1, 0, true, ActiveSlot.SLOT_PRIMARY, 0)
+  end
+  if not mod:hasCollectible(CollectibleType.COLLECTIBLE_KEY_PIECE_2) then
+    player:AddCollectible(CollectibleType.COLLECTIBLE_KEY_PIECE_2, 0, true, ActiveSlot.SLOT_PRIMARY, 0)
+  end
 end
 
 function mod:hasMoreStagesToGo()
@@ -699,6 +727,17 @@ function mod:isRepentanceStageType()
   return stageType == StageType.STAGETYPE_REPENTANCE or stageType == StageType.STAGETYPE_REPENTANCE_B
 end
 
+function mod:isMom()
+  local level = game:GetLevel()
+  local room = level:GetCurrentRoom()
+  local roomDesc = level:GetCurrentRoomDesc()
+  local stage = level:GetStage()
+  
+  return (stage == LevelStage.STAGE3_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE3_1)) and
+         room:IsCurrentRoomLastBoss() and
+         roomDesc.GridIndex >= 0
+end
+
 function mod:isMother()
   local level = game:GetLevel()
   local room = level:GetCurrentRoom()
@@ -810,6 +849,7 @@ mod:AddCallback(ModCallbacks.MC_POST_NEW_LEVEL, mod.onNewLevel)
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.onNewRoom)
 mod:AddCallback(ModCallbacks.MC_POST_UPDATE, mod.onUpdate)
 mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.onRender)
+mod:AddCallback(ModCallbacks.MC_PRE_ENTITY_SPAWN, mod.onPreEntitySpawn)
 mod:AddCallback(ModCallbacks.MC_POST_NPC_INIT, mod.onNpcInit, EntityType.ENTITY_MOTHER)
 mod:AddCallback(ModCallbacks.MC_POST_PICKUP_INIT, mod.onPickupInit, PickupVariant.PICKUP_TROPHY)
 mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, mod.onPlayerInit, 0) -- 0 is player, 1 is co-op baby
