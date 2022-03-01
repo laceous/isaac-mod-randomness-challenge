@@ -81,6 +81,16 @@ mod.endingBosses = {
   { name = 'Knife -> Mom -> Delirium',                                  weight = 1, endstage = LevelStage.STAGE3_2, altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = true },
   { name = 'Mom -> Mother',                                             weight = 3, endstage = LevelStage.STAGE4_2, altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = false },
   { name = 'Mom -> Mother -> Delirium',                                 weight = 1, endstage = LevelStage.STAGE4_2, altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Satan',                                    weight = 3, endstage = LevelStage.STAGE5,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> Mother -> Satan -> Delirium',                        weight = 1, endstage = LevelStage.STAGE5,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Satan -> The Lamb',                        weight = 3, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> Mother -> Satan -> The Lamb -> Delirium',            weight = 1, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Satan -> Mega Satan',                      weight = 3, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = false, megasatan = true,  delirium = false },
+  { name = 'Mom -> Mother -> Isaac',                                    weight = 3, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = true,  hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> Mother -> Isaac -> Delirium',                        weight = 1, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = true,  hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Isaac -> Blue Baby',                       weight = 3, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> Mother -> Isaac -> Blue Baby -> Delirium',           weight = 1, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Isaac -> Mega Satan',                      weight = 3, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = false, megasatan = true,  delirium = false },
   { name = 'Mom -> Mother -> Hush',                                     weight = 2, endstage = LevelStage.STAGE4_3, altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = false },
   { name = 'Mom -> Mother -> Hush -> Delirium',                         weight = 1, endstage = LevelStage.STAGE4_3, altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = true },
   { name = 'Mom -> Mother -> Hush -> Satan',                            weight = 2, endstage = LevelStage.STAGE5,   altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = false },
@@ -270,15 +280,17 @@ function mod:onNewRoom()
        )
     then
       mod:spawnTrapdoor(room:GetCenterPos()) -- trapdoors will stick around
+    elseif mod.state.endingBoss.hush and room:IsClear() and mod:isMother() then -- re-enter mother room after clearing, and headed to hush
+      mod:updateBlueWombTrapdoor() -- the game automatically makes this look like a regular trapdoor, update the sprite again
     elseif mod.state.endingBoss.delirium and room:IsClear() and mod:isHush() then -- re-enter hush room after clearing
       mod:spawnTheVoidDoor() -- doors have to be re-spawned every time
     elseif mod.state.endingBoss.megasatan and stage == LevelStage.STAGE6 and roomDesc.GridIndex == level:GetStartingRoomIndex() then -- spawn mega satan door in first room
       mod:spawnMegaSatanRoomDoor()
     elseif room:IsClear() and room:IsCurrentRoomLastBoss() and mod:hasMoreStagesToGo() then -- re-enter boss room after clearing
       if mod:shouldSpawnBlueWombDoor() then
-        mod:spawnBlueWombDoor()
+        mod:spawnBlueWombDoor(false)
       elseif mod:shouldSpawnSecretExit() then
-        mod:spawnSecretExit() -- for whatever reason, trapdoors in secret exit rooms don't need to be spawned
+        mod:spawnSecretExit(false) -- for whatever reason, trapdoors in secret exit rooms don't need to be spawned
       end
     end
   end
@@ -293,6 +305,7 @@ function mod:onUpdate()
   local hud = game:GetHUD()
   
   mod:closeSecretExitTrapdoor()
+  mod:updateCorpseStage()
   
   if game:GetFrameCount() == mod.showNameAt then
     hud:ShowItemText(level:GetName(), mod.state.endingBoss.name, false)
@@ -574,6 +587,7 @@ function mod:shouldSpawnBlueWombDoor()
   local level = game:GetLevel()
   local stage = level:GetStage()
   
+  -- don't include mother here, i prefer the behavior of spawning a blue womb hole directly from the boss room
   return mod.state.endingBoss.hush and not mod:isRepentanceStageType() and (stage == LevelStage.STAGE4_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE4_1))
 end
 
@@ -652,10 +666,22 @@ function mod:spawnTrapdoor(position)
        mod.state.endingBoss.altpath and
        roomDesc.GridIndex ~= GridRooms.ROOM_BLUE_WOOM_IDX and
        roomDesc.GridIndex ~= GridRooms.ROOM_THE_VOID_IDX and
-       not mod:isRepentanceStageType() and
-       (stage == LevelStage.STAGE4_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE4_1) or stage == LevelStage.STAGE4_3 or stage == LevelStage.STAGE5)
+       (
+         (
+           mod:isRepentanceStageType() and
+           (
+             ((stage == LevelStage.STAGE4_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE4_1)) and not mod.state.endingBoss.hush) or stage == LevelStage.STAGE4_3 or stage == LevelStage.STAGE5
+           )
+         ) or
+         (
+           not mod:isRepentanceStageType() and
+           (
+             (stage == LevelStage.STAGE4_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE4_1)) or stage == LevelStage.STAGE4_3 or stage == LevelStage.STAGE5
+           )
+         )
+       )
      )
-  then
+  then -- heaven door
     if #Isaac.FindByType(EntityType.ENTITY_EFFECT, EffectVariant.HEAVEN_LIGHT_DOOR, 0, false, false) == 0 then
       Isaac.Spawn(EntityType.ENTITY_EFFECT, EffectVariant.HEAVEN_LIGHT_DOOR, 0, position, Vector(0,0), nil)
     end
@@ -665,13 +691,10 @@ function mod:spawnTrapdoor(position)
         room:RemoveGridEntity(gridEntity:GetGridIndex(), 0, false)
       end
     end
-  else
+  else -- trapdoor
     local trapdoor = Isaac.GridSpawn(GridEntityType.GRID_TRAPDOOR, 0, position, true)
-    if mod:isMother() then
-      local sprite = trapdoor:GetSprite()
-      sprite:Load('gfx/grid/door_11_wombhole.anm2', false)
-      sprite:ReplaceSpritesheet(0, 'gfx/grid/door_11_wombhole_blue.png') -- show blue womb hole to hush
-      sprite:LoadGraphics()
+    if mod.state.endingBoss.hush and mod:isMother() then
+      mod:setBlueWombholeSprite(trapdoor:GetSprite())
     end
   end
 end
@@ -680,6 +703,21 @@ function mod:spawnVoidPortal(position)
   local portal = Isaac.GridSpawn(GridEntityType.GRID_TRAPDOOR, 1, position, true)
   portal.VarData = 1
   portal:GetSprite():Load('gfx/grid/voidtrapdoor.anm2', true)
+end
+
+function mod:updateBlueWombTrapdoor()
+  local room = game:GetRoom()
+  
+  local trapdoor = room:GetGridEntity(127)
+  if trapdoor and trapdoor:GetType() == GridEntityType.GRID_TRAPDOOR then
+    mod:setBlueWombholeSprite(trapdoor:GetSprite())
+  end
+end
+
+function mod:setBlueWombholeSprite(sprite)
+  sprite:Load('gfx/grid/door_11_wombhole.anm2', false)
+  sprite:ReplaceSpritesheet(0, 'gfx/grid/door_11_wombhole_blue.png') -- show blue womb hole to hush
+  sprite:LoadGraphics()
 end
 
 -- the game constantly tries to re-open trapdoors, so we have to keep re-closing them
@@ -706,6 +744,35 @@ function mod:closeSecretExitTrapdoor()
       gridEntity:GetSprite():SetFrame('Closed', 0) -- show closed state
     end
   end
+end
+
+function mod:updateCorpseStage()
+  local level = game:GetLevel()
+  local stage = level:GetStage()
+  local stageType = level:GetStageType()
+  
+  if mod:isMother() and mod:isTrapdoorAnimationPlaying() then
+    if mod.state.endingBoss.hush then
+      if stage == LevelStage.STAGE4_1 then
+        level:SetStage(LevelStage.STAGE4_2, stageType) -- going down a trapdoor from corpse xl causes a crash, tell the game we were on corpse 2 which will take us to hush
+      end
+    elseif mod:hasMoreStagesToGo() then
+      level:SetStage(stage, StageType.STAGETYPE_ORIGINAL) -- STAGETYPE_WOTL / STAGETYPE_AFTERBIRTH, needed if we want to go to satan or isaac after mother
+    end
+  end
+end
+
+function mod:isTrapdoorAnimationPlaying()
+  for i = 0, game:GetNumPlayers() - 1 do
+    local player = game:GetPlayer(i)
+    local sprite = player:GetSprite()
+    
+    if sprite:IsPlaying('Trapdoor') or sprite:IsPlaying('LightTravel') then
+      return true
+    end
+  end
+  
+  return false
 end
 
 function mod:hasCollectible(collectible)
