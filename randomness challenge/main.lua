@@ -748,10 +748,11 @@ end
 
 function mod:updateCorpseStage()
   local level = game:GetLevel()
+  local room = level:GetCurrentRoom()
   local stage = level:GetStage()
   local stageType = level:GetStageType()
   
-  if mod:isMother() and mod:isTrapdoorAnimationPlaying() then
+  if room:IsClear() and mod:isMother() and mod:isTrapdoorAnimationPlaying() then
     if mod.state.endingBoss.hush then
       if stage == LevelStage.STAGE4_1 then
         level:SetStage(LevelStage.STAGE4_2, stageType) -- going down a trapdoor from corpse xl causes a crash, tell the game we were on corpse 2 which will take us to hush
