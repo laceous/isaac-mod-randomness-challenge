@@ -7,9 +7,16 @@
 
 There's over 50 paths, including:
 [list]
+    [*]Mom
+    [*]Mom -&gt; It Lives
     [*]Mom -&gt; It Lives -&gt; Isaac
-    [*]Mom -&gt; It Lives -&gt; Satan -&gt; Mega Satan
-    [*]Mom -&gt; Mother -&gt; Hush -&gt; Delirium
+    [*]Mom -&gt; It Lives -&gt; Isaac -&gt; Blue Baby
+    [*]Mom -&gt; It Lives -&gt; Isaac -&gt; Mega Satan
+    [*]Mom -&gt; Mother
+    [*]Mom -&gt; Mother -&gt; Hush
+    [*]Mom -&gt; Mother -&gt; Hush -&gt; Satan
+    [*]Mom -&gt; Mother -&gt; Hush -&gt; Satan -&gt; The Lamb
+    [*]Mom -&gt; Mother -&gt; Hush -&gt; Satan -&gt; The Lamb -&gt; Delirium
     [*]Ascent -&gt; The Beast
 [/list]
 
@@ -69,7 +76,7 @@ Tainted Eden is even more random.
 [b][u]Randomness Challenge (Trainer)[/u][/b]
 
 This challenge starts you as Isaac with TMTRAINER. It's basically the DELETE THIS challenge with a custom path.</description>
-    <version>1.7</version>
+    <version>1.8</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
     <tag id="Challenges"/>

@@ -3,6 +3,7 @@ local json = require('json')
 local game = Game()
 
 mod.onGameStartHasRun = false
+mod.isMomDead = false
 mod.playerHash = nil
 mod.playerType = nil
 mod.showNameAt = -1
@@ -164,7 +165,7 @@ function mod:onGameStart(isContinue)
     end
     
     if die then
-      -- die so they can restart and get back to a good state
+      -- die so we can restart and get back to a good state
       for i = 0, game:GetNumPlayers() - 1 do
         local player = game:GetPlayer(i)
         player:Die() -- Kill
@@ -211,6 +212,7 @@ function mod:onGameExit(shouldSave)
   end
   
   mod.onGameStartHasRun = false
+  mod.isMomDead = false
   mod.playerHash = nil
   mod.playerType = nil
   mod.showNameAt = -1
@@ -261,6 +263,8 @@ function mod:onNewRoom()
   local roomDesc = level:GetCurrentRoomDesc()
   local stage = level:GetStage()
   
+  mod.isMomDead = false
+  
   if level:IsAscent() then
     if roomDesc.GridIndex == level:GetStartingRoomIndex() then
       mod:spawnTrapdoor(room:GetCenterPos()) -- spawn heaven door during ascent
@@ -280,17 +284,19 @@ function mod:onNewRoom()
        )
     then
       mod:spawnTrapdoor(room:GetCenterPos()) -- trapdoors will stick around
-    elseif mod.state.endingBoss.hush and room:IsClear() and mod:isMother() then -- re-enter mother room after clearing, and headed to hush
-      mod:updateBlueWombTrapdoor() -- the game automatically makes this look like a regular trapdoor, update the sprite again
-    elseif mod.state.endingBoss.delirium and room:IsClear() and mod:isHush() then -- re-enter hush room after clearing
-      mod:spawnTheVoidDoor() -- doors have to be re-spawned every time
-    elseif mod.state.endingBoss.megasatan and stage == LevelStage.STAGE6 and roomDesc.GridIndex == level:GetStartingRoomIndex() then -- spawn mega satan door in first room
-      mod:spawnMegaSatanRoomDoor()
-    elseif room:IsClear() and room:IsCurrentRoomLastBoss() and mod:hasMoreStagesToGo() then -- re-enter boss room after clearing
-      if mod:shouldSpawnBlueWombDoor() then
-        mod:spawnBlueWombDoor(false)
-      elseif mod:shouldSpawnSecretExit() then
-        mod:spawnSecretExit(false) -- for whatever reason, trapdoors in secret exit rooms don't need to be spawned
+    elseif mod.state.endingBoss.megasatan and stage == LevelStage.STAGE6 and roomDesc.GridIndex == level:GetStartingRoomIndex() then
+      mod:spawnMegaSatanRoomDoor() -- spawn mega satan door in first room
+    elseif room:IsClear() then
+      if mod.state.endingBoss.hush and mod:isMother() then -- re-enter mother room after clearing, and headed to hush
+        mod:updateBlueWombTrapdoor() -- the game automatically makes this look like a regular trapdoor, update the sprite again
+      elseif mod.state.endingBoss.delirium and mod:isHush() then -- re-enter hush room after clearing
+        mod:spawnTheVoidDoor() -- doors have to be re-spawned every time
+      elseif room:IsCurrentRoomLastBoss() and mod:hasMoreStagesToGo() then -- re-enter boss room after clearing
+        if mod:shouldSpawnBlueWombDoor() then
+          mod:spawnBlueWombDoor(false)
+        elseif mod:shouldSpawnSecretExit() then
+          mod:spawnSecretExit(false) -- for whatever reason, trapdoors in secret exit rooms don't need to be spawned
+        end
       end
     end
   end
@@ -340,16 +346,17 @@ function mod:onPreEntitySpawn(entityType, variant, subType, position, velocity, 
   local room = game:GetRoom()
   
   -- there's options doesn't seem to work in the mom boss room in challenges so we don't need to worry about different positioning
-  if entityType == EntityType.ENTITY_PICKUP and variant == PickupVariant.PICKUP_COLLECTIBLE and position.X == 320 and position.Y == 360 and spawner == nil and room:IsClear() and mod:isMom() and not game:GetStateFlag(GameStateFlag.STATE_MAUSOLEUM_HEART_KILLED) then
+  if entityType == EntityType.ENTITY_PICKUP and variant == PickupVariant.PICKUP_COLLECTIBLE and
+     mod.isMomDead and mod:isMom() and room:IsClear() and
+     position.X == 320 and position.Y == 360 and velocity.X == 0 and velocity.Y == 0 and spawner == nil
+  then
+    mod.isMomDead = false
+    
     if mod.state.endingBoss.endstage == LevelStage.STAGE5 or mod.state.endingBoss.endstage == LevelStage.STAGE6 then
       if mod.state.endingBoss.altpath then
-        if not mod:hasCollectible(CollectibleType.COLLECTIBLE_POLAROID) then
-          return { entityType, variant, CollectibleType.COLLECTIBLE_POLAROID, seed } -- isaac/blue baby
-        end
+        return { entityType, variant, CollectibleType.COLLECTIBLE_POLAROID, seed } -- isaac/blue baby
       else -- not altpath
-        if not mod:hasCollectible(CollectibleType.COLLECTIBLE_NEGATIVE) then
-          return { entityType, variant, CollectibleType.COLLECTIBLE_NEGATIVE, seed } -- satan/the lamb
-        end
+        return { entityType, variant, CollectibleType.COLLECTIBLE_NEGATIVE, seed } -- satan/the lamb
       end
     end
   end
@@ -366,6 +373,17 @@ function mod:onNpcInit(entityNpc)
     -- code borrowed from always void and runs continue past mother mods
     entityNpc:Morph(EntityType.ENTITY_DELIRIUM, 0, 0, -1)
     entityNpc:ClearEntityFlags(EntityFlag.FLAG_APPEAR)
+  end
+end
+
+-- filtered to ENTITY_MOM
+function mod:onNpcDeath(entityNpc)
+  if not mod:isChallenge() then
+    return
+  end
+  
+  if mod:isMom() then
+    mod.isMomDead = true
   end
 end
 
@@ -919,6 +937,7 @@ mod:AddCallback(ModCallbacks.MC_POST_UPDATE, mod.onUpdate)
 mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.onRender)
 mod:AddCallback(ModCallbacks.MC_PRE_ENTITY_SPAWN, mod.onPreEntitySpawn)
 mod:AddCallback(ModCallbacks.MC_POST_NPC_INIT, mod.onNpcInit, EntityType.ENTITY_MOTHER)
+mod:AddCallback(ModCallbacks.MC_POST_NPC_DEATH, mod.onNpcDeath, EntityType.ENTITY_MOM)
 mod:AddCallback(ModCallbacks.MC_POST_PICKUP_INIT, mod.onPickupInit, PickupVariant.PICKUP_TROPHY)
 mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, mod.onPlayerInit, 0) -- 0 is player, 1 is co-op baby
 mod:AddCallback(ModCallbacks.MC_POST_PEFFECT_UPDATE, mod.onPeffectUpdate, PlayerType.PLAYER_ISAAC)
