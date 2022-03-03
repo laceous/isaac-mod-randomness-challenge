@@ -14,10 +14,10 @@ mod.rng = RNG()
 -- init: characters will get their default items if changed in init, some characters like jacob or tainted forgotten have issues being changed in init (crashes, buggy behavior, etc)
 mod.normalPlayerTypes = {
   { player = PlayerType.PLAYER_ISAAC,        init = true,  maxhp = 6, bonehp = 0, redhp = 6, soulhp = 0, blackhp = 0, item = CollectibleType.COLLECTIBLE_D6,            trinket = nil,                              keys = 0, bombs = 1, coins = 0, twin = nil },
-  { player = PlayerType.PLAYER_MAGDALENA,    init = true,  maxhp = 8, bonehp = 0, redhp = 8, soulhp = 0, blackhp = 0, item = nil,                                       trinket = nil,                              keys = 0, bombs = 0, coins = 0, twin = nil },
+  { player = PlayerType.PLAYER_MAGDALENE,    init = true,  maxhp = 8, bonehp = 0, redhp = 8, soulhp = 0, blackhp = 0, item = nil,                                       trinket = nil,                              keys = 0, bombs = 0, coins = 0, twin = nil },
   { player = PlayerType.PLAYER_CAIN,         init = true,  maxhp = 4, bonehp = 0, redhp = 4, soulhp = 0, blackhp = 0, item = nil,                                       trinket = TrinketType.TRINKET_PAPER_CLIP,   keys = 1, bombs = 0, coins = 0, twin = nil },
   { player = PlayerType.PLAYER_JUDAS,        init = true,  maxhp = 2, bonehp = 0, redhp = 2, soulhp = 0, blackhp = 0, item = nil,                                       trinket = nil,                              keys = 0, bombs = 0, coins = 3, twin = nil },
-  { player = PlayerType.PLAYER_XXX,          init = true,  maxhp = 0, bonehp = 0, redhp = 0, soulhp = 6, blackhp = 0, item = nil,                                       trinket = nil,                              keys = 0, bombs = 0, coins = 0, twin = nil },
+  { player = PlayerType.PLAYER_BLUEBABY,     init = true,  maxhp = 0, bonehp = 0, redhp = 0, soulhp = 6, blackhp = 0, item = nil,                                       trinket = nil,                              keys = 0, bombs = 0, coins = 0, twin = nil },
   { player = PlayerType.PLAYER_EVE,          init = true,  maxhp = 4, bonehp = 0, redhp = 4, soulhp = 0, blackhp = 0, item = CollectibleType.COLLECTIBLE_RAZOR_BLADE,   trinket = nil,                              keys = 0, bombs = 0, coins = 0, twin = nil },
   { player = PlayerType.PLAYER_SAMSON,       init = true,  maxhp = 6, bonehp = 0, redhp = 6, soulhp = 0, blackhp = 0, item = nil,                                       trinket = TrinketType.TRINKET_CHILDS_HEART, keys = 0, bombs = 0, coins = 0, twin = nil },
   { player = PlayerType.PLAYER_AZAZEL,       init = true,  maxhp = 0, bonehp = 0, redhp = 0, soulhp = 0, blackhp = 6, item = nil,                                       trinket = nil,                              keys = 0, bombs = 0, coins = 0, twin = nil },
@@ -32,10 +32,10 @@ mod.normalPlayerTypes = {
 }
 mod.taintedPlayerTypes = {
   { player = PlayerType.PLAYER_ISAAC_B,        init = true,  maxhp = 6, bonehp = 0, redhp = 6, soulhp = 0, blackhp = 0, item = nil, trinket = nil, keys = 0, bombs = 1, coins = 0, twin = nil },
-  { player = PlayerType.PLAYER_MAGDALENA_B,    init = true,  maxhp = 8, bonehp = 0, redhp = 2, soulhp = 0, blackhp = 0, item = nil, trinket = nil, keys = 0, bombs = 0, coins = 0, twin = nil }, -- red hearts need to be 2 instead of 4?
+  { player = PlayerType.PLAYER_MAGDALENE_B,    init = true,  maxhp = 8, bonehp = 0, redhp = 2, soulhp = 0, blackhp = 0, item = nil, trinket = nil, keys = 0, bombs = 0, coins = 0, twin = nil }, -- red hearts need to be 2 instead of 4?
   { player = PlayerType.PLAYER_CAIN_B,         init = true,  maxhp = 4, bonehp = 0, redhp = 4, soulhp = 0, blackhp = 0, item = nil, trinket = nil, keys = 1, bombs = 0, coins = 0, twin = nil },
   { player = PlayerType.PLAYER_JUDAS_B,        init = true,  maxhp = 0, bonehp = 0, redhp = 0, soulhp = 0, blackhp = 4, item = nil, trinket = nil, keys = 0, bombs = 0, coins = 3, twin = nil },
-  { player = PlayerType.PLAYER_XXX_B,          init = true,  maxhp = 0, bonehp = 0, redhp = 0, soulhp = 6, blackhp = 0, item = nil, trinket = nil, keys = 0, bombs = 3, coins = 0, twin = nil }, -- 3 poop bombs
+  { player = PlayerType.PLAYER_BLUEBABY_B,     init = true,  maxhp = 0, bonehp = 0, redhp = 0, soulhp = 6, blackhp = 0, item = nil, trinket = nil, keys = 0, bombs = 3, coins = 0, twin = nil }, -- 3 poop bombs
   { player = PlayerType.PLAYER_EVE_B,          init = true,  maxhp = 4, bonehp = 0, redhp = 4, soulhp = 0, blackhp = 0, item = nil, trinket = nil, keys = 0, bombs = 0, coins = 0, twin = nil },
   { player = PlayerType.PLAYER_SAMSON_B,       init = true,  maxhp = 6, bonehp = 0, redhp = 6, soulhp = 0, blackhp = 0, item = nil, trinket = nil, keys = 0, bombs = 0, coins = 0, twin = nil },
   { player = PlayerType.PLAYER_AZAZEL_B,       init = true,  maxhp = 0, bonehp = 0, redhp = 0, soulhp = 0, blackhp = 6, item = nil, trinket = nil, keys = 0, bombs = 0, coins = 0, twin = nil },
