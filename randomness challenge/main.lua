@@ -621,7 +621,7 @@ function mod:shouldSpawnSecretExit()
                (
                  (stage == LevelStage.STAGE1_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE1_1)) or
                  (stage == LevelStage.STAGE2_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE2_1)) or
-                 ((stage == LevelStage.STAGE3_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE3_1)) and not game:GetStateFlag(GameStateFlag.STATE_BACKWARDS_PATH_INIT))
+                 ((stage == LevelStage.STAGE3_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE3_1)) and not game:GetStateFlag(GameStateFlag.STATE_BACKWARDS_PATH_INIT) and not game:GetStateFlag(GameStateFlag.STATE_MAUSOLEUM_HEART_KILLED))
                )
              ) or
              (
@@ -650,8 +650,31 @@ function mod:spawnSecretExit(animate)
   if (isCurse and stage < LevelStage.STAGE3_1) or (not isCurse and stage <= LevelStage.STAGE3_1) then -- doors that require keys/bombs/hearts
     for i = 0, DoorSlot.NUM_DOOR_SLOTS - 1 do
       local door = room:GetDoor(i)
-      if door and door:IsLocked() then
+      if door and door.TargetRoomType == RoomType.ROOM_SECRET_EXIT and door:IsLocked() then
         door:SetLocked(false)
+        break
+      end
+    end
+  elseif mod:isRepentanceStageType() and (stage == LevelStage.STAGE3_2 or (isCurse and stage == LevelStage.STAGE3_1)) then
+    for i = 0, DoorSlot.NUM_DOOR_SLOTS - 1 do
+      local door = room:GetDoor(i)
+      if door then
+        if door.TargetRoomType == RoomType.ROOM_BOSS then -- mausoleum heart
+          if mod:hasCollectible(CollectibleType.COLLECTIBLE_KNIFE_PIECE_1) and mod:hasCollectible(CollectibleType.COLLECTIBLE_KNIFE_PIECE_2) then -- has full knife
+            if door:GetVariant() ~= DoorVariant.DOOR_LOCKED_CRACKED then -- walking out of a disappearing devil/angel room can cause the game to unlock this door when it shouldn't be
+              door:SetVariant(DoorVariant.DOOR_LOCKED_CRACKED)           -- SetLocked(true) won't set the right type of locked door here
+              door:Close()
+            end
+          else -- doesn't have knife
+            if door:IsLocked() then
+              door:SetLocked(false)
+            end
+          end
+        elseif door.TargetRoomType == RoomType.ROOM_DEVIL or door.TargetRoomType == RoomType.ROOM_ANGEL or door.TargetRoomType == RoomType.ROOM_BOSSRUSH then
+          if door:IsLocked() then -- this can happen due to fixing the issue above
+            door:SetLocked(false)
+          end
+        end
       end
     end
   end
@@ -746,7 +769,7 @@ function mod:closeSecretExitTrapdoor()
   local roomDesc = level:GetCurrentRoomDesc()
   local stage = level:GetStage()
   
-  if mod.state.endingBoss.secretpath and roomDesc.GridIndex == GridRooms.ROOM_SECRET_EXIT_IDX and mod:isRepentanceStageType() and
+  if mod.state.endingBoss.secretpath and room:GetType() == RoomType.ROOM_SECRET_EXIT and roomDesc.GridIndex == GridRooms.ROOM_SECRET_EXIT_IDX and mod:isRepentanceStageType() and
      (
        (
          (stage == LevelStage.STAGE1_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE1_1)) and not mod:hasCollectible(CollectibleType.COLLECTIBLE_KNIFE_PIECE_1)
@@ -770,9 +793,10 @@ function mod:updateCorpseStage()
   local stage = level:GetStage()
   local stageType = level:GetStageType()
   
-  if room:IsClear() and mod:isMother() and mod:isTrapdoorAnimationPlaying() then
+  if mod:isRepentanceStageType() and (stage == LevelStage.STAGE4_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE4_1)) and mod:isTrapdoorAnimationPlaying() then
     if mod.state.endingBoss.hush then
       if stage == LevelStage.STAGE4_1 then
+        -- code inspired from runs continue past mother mod
         level:SetStage(LevelStage.STAGE4_2, stageType) -- going down a trapdoor from corpse xl causes a crash, tell the game we were on corpse 2 which will take us to hush
       end
     elseif mod:hasMoreStagesToGo() then
