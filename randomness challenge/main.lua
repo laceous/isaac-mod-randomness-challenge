@@ -790,17 +790,19 @@ end
 function mod:updateCorpseStage()
   local level = game:GetLevel()
   local room = level:GetCurrentRoom()
+  local roomDesc = level:GetCurrentRoomDesc()
   local stage = level:GetStage()
   local stageType = level:GetStageType()
   
-  if mod:isRepentanceStageType() and (stage == LevelStage.STAGE4_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE4_1)) and mod:isTrapdoorAnimationPlaying() then
-    if mod.state.endingBoss.hush then
-      if stage == LevelStage.STAGE4_1 then
-        -- code inspired from runs continue past mother mod
-        level:SetStage(LevelStage.STAGE4_2, stageType) -- going down a trapdoor from corpse xl causes a crash, tell the game we were on corpse 2 which will take us to hush
-      end
-    elseif mod:hasMoreStagesToGo() then
+  if mod:isRepentanceStageType() and (stage == LevelStage.STAGE4_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE4_1)) and
+     roomDesc.GridIndex ~= GridRooms.ROOM_BLUE_WOOM_IDX and not room:IsCurrentRoomLastBoss() and mod:isTrapdoorAnimationPlaying()
+  then
+    if mod:hasMoreStagesToGo() and not mod.state.endingBoss.hush then
+      -- code inspired from runs continue past mother mod
       level:SetStage(stage, StageType.STAGETYPE_ORIGINAL) -- STAGETYPE_WOTL / STAGETYPE_AFTERBIRTH, needed if we want to go to satan or isaac after mother
+    elseif stage == LevelStage.STAGE4_1 then
+      -- the default after corpse 2 is to go to hush, however going down a trapdoor from corpse xl causes a crash, tell the game we were on corpse 2 which will take us to hush
+      level:SetStage(LevelStage.STAGE4_2, stageType)
     end
   end
 end
