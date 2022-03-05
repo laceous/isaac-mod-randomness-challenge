@@ -795,7 +795,7 @@ function mod:updateCorpseStage()
   local stageType = level:GetStageType()
   
   if mod:isRepentanceStageType() and (stage == LevelStage.STAGE4_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE4_1)) and
-     roomDesc.GridIndex ~= GridRooms.ROOM_BLUE_WOOM_IDX and not room:IsCurrentRoomLastBoss() and mod:isTrapdoorAnimationPlaying()
+     roomDesc.GridIndex ~= GridRooms.ROOM_BLUE_WOOM_IDX and not room:IsCurrentRoomLastBoss() and mod:isTakingTrapdoor()
   then
     if mod:hasMoreStagesToGo() and not mod.state.endingBoss.hush then
       -- code inspired from runs continue past mother mod
@@ -807,13 +807,27 @@ function mod:updateCorpseStage()
   end
 end
 
-function mod:isTrapdoorAnimationPlaying()
+function mod:isTakingTrapdoor()
+  local room = game:GetRoom()
+  
   for i = 0, game:GetNumPlayers() - 1 do
     local player = game:GetPlayer(i)
+    local playerIdx = room:GetGridIndex(player.Position)
     local sprite = player:GetSprite()
     
-    if sprite:IsPlaying('Trapdoor') or sprite:IsPlaying('LightTravel') then
-      return true
+    if sprite:IsPlaying('Trapdoor') then
+      local gridEntity = room:GetGridEntity(playerIdx)
+      if gridEntity and gridEntity:GetType() == GridEntityType.GRID_TRAPDOOR then
+        if gridEntity.VarData ~= 1 then -- exclude void portal
+          return true
+        end
+      end
+    elseif sprite:IsPlaying('LightTravel') then
+      for _, entity in ipairs(Isaac.FindByType(EntityType.ENTITY_EFFECT, EffectVariant.HEAVEN_LIGHT_DOOR, 0, false, false)) do
+        if playerIdx == room:GetGridIndex(entity.Position) then
+          return true
+        end
+      end
     end
   end
   
