@@ -507,7 +507,7 @@ function mod:changePlayerType(player, playerType)
   end
   
   player:AddKeys(playerType.keys)
-  if player:GetPlayerType() == PlayerType.PLAYER_XXX_B then
+  if player:GetPlayerType() == PlayerType.PLAYER_BLUEBABY_B then
     player:AddPoopMana(playerType.bombs)
   else
     player:AddBombs(playerType.bombs)
