@@ -228,10 +228,10 @@ function mod:onCurseEval(curses)
   local level = game:GetLevel()
   local stage = level:GetStage()
   
-  if not mod.state.endingBoss.secretpath and mod.state.endingBoss.endstage == LevelStage.STAGE8 and not mod:isRepentanceStageType() and stage == LevelStage.STAGE3_1 then -- not secret path and beast
+  if mod.state.endingBoss.endstage == LevelStage.STAGE8 and stage == LevelStage.STAGE3_1 then -- beast
     local curse = LevelCurse.CURSE_OF_LABYRINTH
     if curses & curse == curse then
-      return curses & ~curse -- remove curse of the labyrinth
+      curses = curses & ~curse -- remove curse of the labyrinth
     end
   end
   
