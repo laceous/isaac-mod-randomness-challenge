@@ -362,20 +362,6 @@ function mod:onPreEntitySpawn(entityType, variant, subType, position, velocity, 
   end
 end
 
--- filtered to ENTITY_MOTHER
--- prevents delirium from transforming into mother (instantly killing her)
-function mod:onNpcInit(entityNpc)
-  if not mod:isChallenge() then
-    return
-  end
-  
-  if mod:isDelirium() then
-    -- code borrowed from always void and runs continue past mother mods
-    entityNpc:Morph(EntityType.ENTITY_DELIRIUM, 0, 0, -1)
-    entityNpc:ClearEntityFlags(EntityFlag.FLAG_APPEAR)
-  end
-end
-
 -- filtered to ENTITY_MOM
 function mod:onNpcDeath(entityNpc)
   if not mod:isChallenge() then
@@ -887,17 +873,6 @@ function mod:isHush()
          roomDesc.GridIndex >= 0
 end
 
-function mod:isDelirium()
-  local level = game:GetLevel()
-  local room = level:GetCurrentRoom()
-  local roomDesc = level:GetCurrentRoomDesc()
-  
-  return level:GetStage() == LevelStage.STAGE7 and
-         room:GetType() == RoomType.ROOM_BOSS and
-         room:GetRoomShape() == RoomShape.ROOMSHAPE_2x2 and
-         roomDesc.GridIndex >= 0
-end
-
 function mod:isCurseOfTheLabyrinth()
   local level = game:GetLevel()
   local curses = level:GetCurses()
@@ -976,7 +951,6 @@ mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.onNewRoom)
 mod:AddCallback(ModCallbacks.MC_POST_UPDATE, mod.onUpdate)
 mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.onRender)
 mod:AddCallback(ModCallbacks.MC_PRE_ENTITY_SPAWN, mod.onPreEntitySpawn)
-mod:AddCallback(ModCallbacks.MC_POST_NPC_INIT, mod.onNpcInit, EntityType.ENTITY_MOTHER)
 mod:AddCallback(ModCallbacks.MC_POST_NPC_DEATH, mod.onNpcDeath, EntityType.ENTITY_MOM)
 mod:AddCallback(ModCallbacks.MC_POST_PICKUP_INIT, mod.onPickupInit, PickupVariant.PICKUP_TROPHY)
 mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, mod.onPlayerInit, 0) -- 0 is player, 1 is co-op baby
