@@ -35,31 +35,105 @@ There's 5 challenges that are based around character selection.
 [b][u]Randomness Challenge[/u][/b]
 
 This challenge will start you with a random character.
-[olist]
-    [*]Isaac
-    [*]Maggy
-    [*]Cain
-    [*]Judas
-    [*]Blue Baby
-    [*]Eve
-    [*]Samson
-    [*]Azazel
-    [*]Lazarus
-    [*]The Lost
-    [*]Lilith
-    [*]Keeper
-    [*]Apollyon
-    [*]The Forgotten
-    [*]Bethany
-    [*]Jacob and Esau
-[/olist]
+[table]
+    [tr]
+        [th]#[/th]
+        [th]Regular[/th]
+        [th]Tainted[/th]
+    [/tr]
+    [tr]
+        [td]1[/td]
+        [td]Isaac[/td]
+        [td]Tainted Isaac[/td]
+    [/tr]
+    [tr]
+        [td]2[/td]
+        [td]Magdalene[/td]
+        [td]Tainted Magdalene[/td]
+    [/tr]
+    [tr]
+        [td]3[/td]
+        [td]Cain[/td]
+        [td]Tainted Cain[/td]
+    [/tr]
+    [tr]
+        [td]4[/td]
+        [td]Judas[/td]
+        [td]Tainted Judas[/td]
+    [/tr]
+    [tr]
+        [td]5[/td]
+        [td]???[/td]
+        [td]Tainted ???[/td]
+    [/tr]
+    [tr]
+        [td]6[/td]
+        [td]Eve[/td]
+        [td]Tainted Eve[/td]
+    [/tr]
+    [tr]
+        [td]7[/td]
+        [td]Samson[/td]
+        [td]Tainted Samson[/td]
+    [/tr]
+    [tr]
+        [td]8[/td]
+        [td]Azazel[/td]
+        [td]Tainted Azazel[/td]
+    [/tr]
+    [tr]
+        [td]9[/td]
+        [td]Lazarus[/td]
+        [td]Tainted Lazarus[/td]
+    [/tr]
+    [tr]
+        [td]10[/td]
+        [td]The Lost[/td]
+        [td]Tainted Lost[/td]
+    [/tr]
+    [tr]
+        [td]11[/td]
+        [td]Lilith[/td]
+        [td]Tainted Lilith[/td]
+    [/tr]
+    [tr]
+        [td]12[/td]
+        [td]Keeper[/td]
+        [td]Tainted Keeper[/td]
+    [/tr]
+    [tr]
+        [td]13[/td]
+        [td]Apollyon[/td]
+        [td]Tainted Apollyon[/td]
+    [/tr]
+    [tr]
+        [td]14[/td]
+        [td]The Forgotten[/td]
+        [td]Tainted Forgotten[/td]
+    [/tr]
+    [tr]
+        [td]15[/td]
+        [td]Bethany[/td]
+        [td]Tainted Bethany[/td]
+    [/tr]
+    [tr]
+        [td]16[/td]
+        [td]Jacob and Esau[/td]
+        [td]Tainted Jacob[/td]
+    [/tr]
+[/table]
 
-If you really want to start with a specific character then you can press the corresponding number(s) on your keyboard when starting the challenge. For example:
+If you really want to start with a specific character then you can press the corresponding key(s) on your keyboard when starting the challenge. For example:
 [list]
     [*]1 = Isaac
+    [*]T + 1 = Tainted Isaac
     [*]0 = 10 = The Lost
     [*]0 + 1 = 11 = Lilith
 [/list]
+
+[b][u]Randomness Challenge (Regular)[/u][/b]
+
+This challenge will start you with a random regular character from the list above.
 
 [b][u]Randomness Challenge (Tainted)[/u][/b]
 

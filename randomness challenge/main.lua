@@ -12,7 +12,7 @@ mod.rng = RNG()
 -- only include items that the game doesn't setup by default, usually these are unlockable items (+ hearts, keys, bombs, coins)
 -- hearts except for bone hearts require x2 for full hearts
 -- init: characters will get their default items if changed in init, some characters like jacob or tainted forgotten have issues being changed in init (crashes, buggy behavior, etc)
-mod.normalPlayerTypes = {
+mod.regularPlayerTypes = {
   { player = PlayerType.PLAYER_ISAAC,        init = true,  maxhp = 6, bonehp = 0, redhp = 6, soulhp = 0, blackhp = 0, item = CollectibleType.COLLECTIBLE_D6,            trinket = nil,                              keys = 0, bombs = 1, coins = 0, twin = nil },
   { player = PlayerType.PLAYER_MAGDALENE,    init = true,  maxhp = 8, bonehp = 0, redhp = 8, soulhp = 0, blackhp = 0, item = nil,                                       trinket = nil,                              keys = 0, bombs = 0, coins = 0, twin = nil },
   { player = PlayerType.PLAYER_CAIN,         init = true,  maxhp = 4, bonehp = 0, redhp = 4, soulhp = 0, blackhp = 0, item = nil,                                       trinket = TrinketType.TRINKET_PAPER_CLIP,   keys = 1, bombs = 0, coins = 0, twin = nil },
@@ -421,9 +421,11 @@ function mod:onPlayerInit(player)
   end
   
   if mod:isRandomChallenge() then
-    mod:choosePlayerType(player, mod.normalPlayerTypes)
+    mod:choosePlayerType(player, true, true)
+  elseif mod:isRegularChallenge() then
+    mod:choosePlayerType(player, true, false)
   elseif mod:isTaintedChallenge() then
-    mod:choosePlayerType(player, mod.taintedPlayerTypes)
+    mod:choosePlayerType(player, false, true)
   end
 end
 
@@ -444,18 +446,37 @@ function mod:onPeffectUpdate(player)
   end
 end
 
-function mod:choosePlayerType(player, playerTypes)
-  local index
+function mod:choosePlayerType(player, useRegularPlayerTypes, useTaintedPlayerTypes)
+  local playerType
   local sum = mod:getKeyboardSum()
-  local playerTypesCount = #playerTypes
-  if sum >= 1 and sum <= playerTypesCount then
-    index = sum
-  else
-    -- RandomInt returns 0 to max-1, lua tables use 1-based indexes
-    index = mod.rng:RandomInt(playerTypesCount) + 1
-  end
   
-  local playerType = playerTypes[index]
+  if useRegularPlayerTypes and useTaintedPlayerTypes then
+    local regularPlayerTypesCount = #mod.regularPlayerTypes
+    local taintedPlayerTypesCount = #mod.taintedPlayerTypes
+    
+    if mod:isTaintedKeyboardModifier() and sum >= 1 and sum <= taintedPlayerTypesCount then
+      playerType = mod.taintedPlayerTypes[sum]
+    elseif sum >= 1 and sum <= regularPlayerTypesCount then
+      playerType = mod.regularPlayerTypes[sum]
+    else
+      -- RandomInt returns 0 to max-1, lua tables use 1-based indexes
+      local rand = mod.rng:RandomInt(regularPlayerTypesCount + taintedPlayerTypesCount) + 1
+      if rand <= regularPlayerTypesCount then
+        playerType = mod.regularPlayerTypes[rand]
+      else
+        playerType = mod.taintedPlayerTypes[rand - regularPlayerTypesCount]
+      end
+    end
+  else
+    local playerTypes = useTaintedPlayerTypes and mod.taintedPlayerTypes or mod.regularPlayerTypes
+    local playerTypesCount = #playerTypes
+    
+    if sum >= 1 and sum <= playerTypesCount then
+      playerType = playerTypes[sum]
+    else
+      playerType = playerTypes[mod.rng:RandomInt(playerTypesCount) + 1]
+    end
+  end
   
   -- always clear this in init
   mod:clearKeysBombsCoins(player)
@@ -554,7 +575,7 @@ function mod:getKeyboardSum()
     [Keyboard.KEY_KP_7] = 7,
     [Keyboard.KEY_KP_8] = 8,
     [Keyboard.KEY_KP_9] = 9,
-    [Keyboard.KEY_KP_0] = 10,
+    [Keyboard.KEY_KP_0] = 10
   }
   
   local sum = 0
@@ -567,6 +588,11 @@ function mod:getKeyboardSum()
   end
   
   return sum
+end
+
+function mod:isTaintedKeyboardModifier()
+  local keyboard = 0
+  return Input.IsButtonPressed(Keyboard.KEY_T, keyboard)
 end
 
 function mod:addKeyPieces()
@@ -926,6 +952,7 @@ end
 function mod:isChallenge()
   local challenge = Isaac.GetChallenge()
   return challenge == Isaac.GetChallengeIdByName('Randomness Challenge') or
+         challenge == Isaac.GetChallengeIdByName('Randomness Challenge (Regular)') or
          challenge == Isaac.GetChallengeIdByName('Randomness Challenge (Tainted)') or
          challenge == Isaac.GetChallengeIdByName('Randomness Challenge (Eden)') or
          challenge == Isaac.GetChallengeIdByName('Randomness Challenge (T-Eden)') or
@@ -935,6 +962,11 @@ end
 function mod:isRandomChallenge()
   local challenge = Isaac.GetChallenge()
   return challenge == Isaac.GetChallengeIdByName('Randomness Challenge')
+end
+
+function mod:isRegularChallenge()
+  local challenge = Isaac.GetChallenge()
+  return challenge == Isaac.GetChallengeIdByName('Randomness Challenge (Regular)')
 end
 
 function mod:isTaintedChallenge()
