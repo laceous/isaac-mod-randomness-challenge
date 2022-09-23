@@ -151,7 +151,7 @@ Tainted Eden is even more random.
 [b][u]Randomness Challenge (Trainer)[/u][/b]
 
 This challenge starts you as Isaac with TMTRAINER. It's basically the DELETE THIS challenge with a custom path.</description>
-    <version>1.16</version>
+    <version>1.17</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
     <tag id="Challenges"/>
