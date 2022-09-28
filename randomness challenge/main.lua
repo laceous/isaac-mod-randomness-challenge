@@ -50,62 +50,70 @@ mod.taintedPlayerTypes = {
 }
 
 -- endstage: use 2 of 2 and not the void
--- mega satan and the beast normally go directly to a cutscene, so not including delirium as an option
+-- the beast goes directly to a cutscene, so not including delirium as an option
 mod.endingBosses = {
-  { name = 'Mom',                                                       weight = 3, endstage = LevelStage.STAGE3_2, altpath = false, secretpath = false, hush = false, megasatan = false, delirium = false },
-  { name = 'Mom -> Delirium',                                           weight = 1, endstage = LevelStage.STAGE3_2, altpath = false, secretpath = false, hush = false, megasatan = false, delirium = true },
-  { name = 'Mom -> It Lives',                                           weight = 3, endstage = LevelStage.STAGE4_2, altpath = false, secretpath = false, hush = false, megasatan = false, delirium = false },
-  { name = 'Mom -> It Lives -> Delirium',                               weight = 1, endstage = LevelStage.STAGE4_2, altpath = false, secretpath = false, hush = false, megasatan = false, delirium = true },
-  { name = 'Mom -> It Lives -> Satan',                                  weight = 3, endstage = LevelStage.STAGE5,   altpath = false, secretpath = false, hush = false, megasatan = false, delirium = false },
-  { name = 'Mom -> It Lives -> Satan -> Delirium',                      weight = 1, endstage = LevelStage.STAGE5,   altpath = false, secretpath = false, hush = false, megasatan = false, delirium = true },
-  { name = 'Mom -> It Lives -> Satan -> The Lamb',                      weight = 3, endstage = LevelStage.STAGE6,   altpath = false, secretpath = false, hush = false, megasatan = false, delirium = false },
-  { name = 'Mom -> It Lives -> Satan -> The Lamb -> Delirium',          weight = 1, endstage = LevelStage.STAGE6,   altpath = false, secretpath = false, hush = false, megasatan = false, delirium = true },
-  { name = 'Mom -> It Lives -> Satan -> Mega Satan',                    weight = 3, endstage = LevelStage.STAGE6,   altpath = false, secretpath = false, hush = false, megasatan = true,  delirium = false },
-  { name = 'Mom -> It Lives -> Isaac',                                  weight = 3, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = false, hush = false, megasatan = false, delirium = false },
-  { name = 'Mom -> It Lives -> Isaac -> Delirium',                      weight = 1, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = false, hush = false, megasatan = false, delirium = true },
-  { name = 'Mom -> It Lives -> Isaac -> Blue Baby',                     weight = 3, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = false, hush = false, megasatan = false, delirium = false },
-  { name = 'Mom -> It Lives -> Isaac -> Blue Baby -> Delirium',         weight = 1, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = false, hush = false, megasatan = false, delirium = true },
-  { name = 'Mom -> It Lives -> Isaac -> Mega Satan',                    weight = 3, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = false, hush = false, megasatan = true,  delirium = false },
-  { name = 'Mom -> It Lives -> Hush',                                   weight = 2, endstage = LevelStage.STAGE4_3, altpath = false, secretpath = false, hush = true,  megasatan = false, delirium = false },
-  { name = 'Mom -> It Lives -> Hush -> Delirium',                       weight = 1, endstage = LevelStage.STAGE4_3, altpath = false, secretpath = false, hush = true,  megasatan = false, delirium = true },
-  { name = 'Mom -> It Lives -> Hush -> Satan',                          weight = 2, endstage = LevelStage.STAGE5,   altpath = false, secretpath = false, hush = true,  megasatan = false, delirium = false },
-  { name = 'Mom -> It Lives -> Hush -> Satan -> Delirium',              weight = 1, endstage = LevelStage.STAGE5,   altpath = false, secretpath = false, hush = true,  megasatan = false, delirium = true },
-  { name = 'Mom -> It Lives -> Hush -> Satan -> The Lamb',              weight = 2, endstage = LevelStage.STAGE6,   altpath = false, secretpath = false, hush = true,  megasatan = false, delirium = false },
-  { name = 'Mom -> It Lives -> Hush -> Satan -> The Lamb -> Delirium',  weight = 1, endstage = LevelStage.STAGE6,   altpath = false, secretpath = false, hush = true,  megasatan = false, delirium = true },
-  { name = 'Mom -> It Lives -> Hush -> Satan -> Mega Satan',            weight = 2, endstage = LevelStage.STAGE6,   altpath = false, secretpath = false, hush = true,  megasatan = true,  delirium = false },
-  { name = 'Mom -> It Lives -> Hush -> Isaac',                          weight = 2, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = false, hush = true,  megasatan = false, delirium = false },
-  { name = 'Mom -> It Lives -> Hush -> Isaac -> Delirium',              weight = 1, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = false, hush = true,  megasatan = false, delirium = true },
-  { name = 'Mom -> It Lives -> Hush -> Isaac -> Blue Baby',             weight = 2, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = false, hush = true,  megasatan = false, delirium = false },
-  { name = 'Mom -> It Lives -> Hush -> Isaac -> Blue Baby -> Delirium', weight = 1, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = false, hush = true,  megasatan = false, delirium = true },
-  { name = 'Mom -> It Lives -> Hush -> Isaac -> Mega Satan',            weight = 2, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = false, hush = true,  megasatan = true,  delirium = false },
-  { name = 'Knife -> Mom',                                              weight = 3, endstage = LevelStage.STAGE3_2, altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = false },
-  { name = 'Knife -> Mom -> Delirium',                                  weight = 1, endstage = LevelStage.STAGE3_2, altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = true },
-  { name = 'Mom -> Mother',                                             weight = 3, endstage = LevelStage.STAGE4_2, altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = false },
-  { name = 'Mom -> Mother -> Delirium',                                 weight = 1, endstage = LevelStage.STAGE4_2, altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = true },
-  { name = 'Mom -> Mother -> Satan',                                    weight = 3, endstage = LevelStage.STAGE5,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = false },
-  { name = 'Mom -> Mother -> Satan -> Delirium',                        weight = 1, endstage = LevelStage.STAGE5,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = true },
-  { name = 'Mom -> Mother -> Satan -> The Lamb',                        weight = 3, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = false },
-  { name = 'Mom -> Mother -> Satan -> The Lamb -> Delirium',            weight = 1, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = true },
-  { name = 'Mom -> Mother -> Satan -> Mega Satan',                      weight = 3, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = false, megasatan = true,  delirium = false },
-  { name = 'Mom -> Mother -> Isaac',                                    weight = 3, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = true,  hush = false, megasatan = false, delirium = false },
-  { name = 'Mom -> Mother -> Isaac -> Delirium',                        weight = 1, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = true,  hush = false, megasatan = false, delirium = true },
-  { name = 'Mom -> Mother -> Isaac -> Blue Baby',                       weight = 3, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = false, megasatan = false, delirium = false },
-  { name = 'Mom -> Mother -> Isaac -> Blue Baby -> Delirium',           weight = 1, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = false, megasatan = false, delirium = true },
-  { name = 'Mom -> Mother -> Isaac -> Mega Satan',                      weight = 3, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = false, megasatan = true,  delirium = false },
-  { name = 'Mom -> Mother -> Hush',                                     weight = 2, endstage = LevelStage.STAGE4_3, altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = false },
-  { name = 'Mom -> Mother -> Hush -> Delirium',                         weight = 1, endstage = LevelStage.STAGE4_3, altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = true },
-  { name = 'Mom -> Mother -> Hush -> Satan',                            weight = 2, endstage = LevelStage.STAGE5,   altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = false },
-  { name = 'Mom -> Mother -> Hush -> Satan -> Delirium',                weight = 1, endstage = LevelStage.STAGE5,   altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = true },
-  { name = 'Mom -> Mother -> Hush -> Satan -> The Lamb',                weight = 2, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = false },
-  { name = 'Mom -> Mother -> Hush -> Satan -> The Lamb -> Delirium',    weight = 1, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = true },
-  { name = 'Mom -> Mother -> Hush -> Satan -> Mega Satan',              weight = 2, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = true,  megasatan = true,  delirium = false },
-  { name = 'Mom -> Mother -> Hush -> Isaac',                            weight = 2, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = true,  hush = true,  megasatan = false, delirium = false },
-  { name = 'Mom -> Mother -> Hush -> Isaac -> Delirium',                weight = 1, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = true,  hush = true,  megasatan = false, delirium = true },
-  { name = 'Mom -> Mother -> Hush -> Isaac -> Blue Baby',               weight = 2, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = true,  megasatan = false, delirium = false },
-  { name = 'Mom -> Mother -> Hush -> Isaac -> Blue Baby -> Delirium',   weight = 1, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = true,  megasatan = false, delirium = true },
-  { name = 'Mom -> Mother -> Hush -> Isaac -> Mega Satan',              weight = 2, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = true,  megasatan = true,  delirium = false },
-  { name = 'Ascent -> The Beast',                                       weight = 5, endstage = LevelStage.STAGE8,   altpath = false, secretpath = false, hush = false, megasatan = false, delirium = false }, -- there's no way to spawn the door to the pre-ascent so we'll go to the mausoleum via the boss room
-  { name = 'Knife -> Ascent -> The Beast',                              weight = 5, endstage = LevelStage.STAGE8,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = false }
+  { name = 'Mom',                                                        weight = 3, endstage = LevelStage.STAGE3_2, altpath = false, secretpath = false, hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> Delirium',                                            weight = 1, endstage = LevelStage.STAGE3_2, altpath = false, secretpath = false, hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> It Lives',                                            weight = 3, endstage = LevelStage.STAGE4_2, altpath = false, secretpath = false, hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> It Lives -> Delirium',                                weight = 1, endstage = LevelStage.STAGE4_2, altpath = false, secretpath = false, hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> It Lives -> Satan',                                   weight = 3, endstage = LevelStage.STAGE5,   altpath = false, secretpath = false, hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> It Lives -> Satan -> Delirium',                       weight = 1, endstage = LevelStage.STAGE5,   altpath = false, secretpath = false, hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> It Lives -> Satan -> The Lamb',                       weight = 3, endstage = LevelStage.STAGE6,   altpath = false, secretpath = false, hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> It Lives -> Satan -> The Lamb -> Delirium',           weight = 1, endstage = LevelStage.STAGE6,   altpath = false, secretpath = false, hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> It Lives -> Satan -> Mega Satan',                     weight = 3, endstage = LevelStage.STAGE6,   altpath = false, secretpath = false, hush = false, megasatan = true,  delirium = false },
+  { name = 'Mom -> It Lives -> Satan -> Mega Satan -> Delirium',         weight = 1, endstage = LevelStage.STAGE6,   altpath = false, secretpath = false, hush = false, megasatan = true,  delirium = true },
+  { name = 'Mom -> It Lives -> Isaac',                                   weight = 3, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = false, hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> It Lives -> Isaac -> Delirium',                       weight = 1, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = false, hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> It Lives -> Isaac -> Blue Baby',                      weight = 3, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = false, hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> It Lives -> Isaac -> Blue Baby -> Delirium',          weight = 1, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = false, hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> It Lives -> Isaac -> Mega Satan',                     weight = 3, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = false, hush = false, megasatan = true,  delirium = false },
+  { name = 'Mom -> It Lives -> Isaac -> Mega Satan -> Delirium',         weight = 1, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = false, hush = false, megasatan = true,  delirium = true },
+  { name = 'Mom -> It Lives -> Hush',                                    weight = 2, endstage = LevelStage.STAGE4_3, altpath = false, secretpath = false, hush = true,  megasatan = false, delirium = false },
+  { name = 'Mom -> It Lives -> Hush -> Delirium',                        weight = 1, endstage = LevelStage.STAGE4_3, altpath = false, secretpath = false, hush = true,  megasatan = false, delirium = true },
+  { name = 'Mom -> It Lives -> Hush -> Satan',                           weight = 2, endstage = LevelStage.STAGE5,   altpath = false, secretpath = false, hush = true,  megasatan = false, delirium = false },
+  { name = 'Mom -> It Lives -> Hush -> Satan -> Delirium',               weight = 1, endstage = LevelStage.STAGE5,   altpath = false, secretpath = false, hush = true,  megasatan = false, delirium = true },
+  { name = 'Mom -> It Lives -> Hush -> Satan -> The Lamb',               weight = 2, endstage = LevelStage.STAGE6,   altpath = false, secretpath = false, hush = true,  megasatan = false, delirium = false },
+  { name = 'Mom -> It Lives -> Hush -> Satan -> The Lamb -> Delirium',   weight = 1, endstage = LevelStage.STAGE6,   altpath = false, secretpath = false, hush = true,  megasatan = false, delirium = true },
+  { name = 'Mom -> It Lives -> Hush -> Satan -> Mega Satan',             weight = 2, endstage = LevelStage.STAGE6,   altpath = false, secretpath = false, hush = true,  megasatan = true,  delirium = false },
+  { name = 'Mom -> It Lives -> Hush -> Satan -> Mega Satan -> Delirium', weight = 1, endstage = LevelStage.STAGE6,   altpath = false, secretpath = false, hush = true,  megasatan = true,  delirium = true },
+  { name = 'Mom -> It Lives -> Hush -> Isaac',                           weight = 2, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = false, hush = true,  megasatan = false, delirium = false },
+  { name = 'Mom -> It Lives -> Hush -> Isaac -> Delirium',               weight = 1, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = false, hush = true,  megasatan = false, delirium = true },
+  { name = 'Mom -> It Lives -> Hush -> Isaac -> Blue Baby',              weight = 2, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = false, hush = true,  megasatan = false, delirium = false },
+  { name = 'Mom -> It Lives -> Hush -> Isaac -> Blue Baby -> Delirium',  weight = 1, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = false, hush = true,  megasatan = false, delirium = true },
+  { name = 'Mom -> It Lives -> Hush -> Isaac -> Mega Satan',             weight = 2, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = false, hush = true,  megasatan = true,  delirium = false },
+  { name = 'Mom -> It Lives -> Hush -> Isaac -> Mega Satan -> Delirium', weight = 1, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = false, hush = true,  megasatan = true,  delirium = true },
+  { name = 'Knife -> Mom',                                               weight = 3, endstage = LevelStage.STAGE3_2, altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = false },
+  { name = 'Knife -> Mom -> Delirium',                                   weight = 1, endstage = LevelStage.STAGE3_2, altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> Mother',                                              weight = 3, endstage = LevelStage.STAGE4_2, altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> Mother -> Delirium',                                  weight = 1, endstage = LevelStage.STAGE4_2, altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Satan',                                     weight = 3, endstage = LevelStage.STAGE5,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> Mother -> Satan -> Delirium',                         weight = 1, endstage = LevelStage.STAGE5,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Satan -> The Lamb',                         weight = 3, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> Mother -> Satan -> The Lamb -> Delirium',             weight = 1, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Satan -> Mega Satan',                       weight = 3, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = false, megasatan = true,  delirium = false },
+  { name = 'Mom -> Mother -> Satan -> Mega Satan -> Delirium',           weight = 1, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = false, megasatan = true,  delirium = true },
+  { name = 'Mom -> Mother -> Isaac',                                     weight = 3, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = true,  hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> Mother -> Isaac -> Delirium',                         weight = 1, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = true,  hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Isaac -> Blue Baby',                        weight = 3, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = false, megasatan = false, delirium = false },
+  { name = 'Mom -> Mother -> Isaac -> Blue Baby -> Delirium',            weight = 1, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = false, megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Isaac -> Mega Satan',                       weight = 3, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = false, megasatan = true,  delirium = false },
+  { name = 'Mom -> Mother -> Isaac -> Mega Satan -> Delirium',           weight = 1, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = false, megasatan = true,  delirium = true },
+  { name = 'Mom -> Mother -> Hush',                                      weight = 2, endstage = LevelStage.STAGE4_3, altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = false },
+  { name = 'Mom -> Mother -> Hush -> Delirium',                          weight = 1, endstage = LevelStage.STAGE4_3, altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Hush -> Satan',                             weight = 2, endstage = LevelStage.STAGE5,   altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = false },
+  { name = 'Mom -> Mother -> Hush -> Satan -> Delirium',                 weight = 1, endstage = LevelStage.STAGE5,   altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Hush -> Satan -> The Lamb',                 weight = 2, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = false },
+  { name = 'Mom -> Mother -> Hush -> Satan -> The Lamb -> Delirium',     weight = 1, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = true,  megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Hush -> Satan -> Mega Satan',               weight = 2, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = true,  megasatan = true,  delirium = false },
+  { name = 'Mom -> Mother -> Hush -> Satan -> Mega Satan -> Delirium',   weight = 1, endstage = LevelStage.STAGE6,   altpath = false, secretpath = true,  hush = true,  megasatan = true,  delirium = true },
+  { name = 'Mom -> Mother -> Hush -> Isaac',                             weight = 2, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = true,  hush = true,  megasatan = false, delirium = false },
+  { name = 'Mom -> Mother -> Hush -> Isaac -> Delirium',                 weight = 1, endstage = LevelStage.STAGE5,   altpath = true,  secretpath = true,  hush = true,  megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Hush -> Isaac -> Blue Baby',                weight = 2, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = true,  megasatan = false, delirium = false },
+  { name = 'Mom -> Mother -> Hush -> Isaac -> Blue Baby -> Delirium',    weight = 1, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = true,  megasatan = false, delirium = true },
+  { name = 'Mom -> Mother -> Hush -> Isaac -> Mega Satan',               weight = 2, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = true,  megasatan = true,  delirium = false },
+  { name = 'Mom -> Mother -> Hush -> Isaac -> Mega Satan -> Delirium',   weight = 1, endstage = LevelStage.STAGE6,   altpath = true,  secretpath = true,  hush = true,  megasatan = true,  delirium = true },
+  { name = 'Ascent -> The Beast',                                        weight = 5, endstage = LevelStage.STAGE8,   altpath = false, secretpath = false, hush = false, megasatan = false, delirium = false }, -- there's no way to consistently spawn the door to the pre-ascent so we'll go to the mausoleum via the boss room
+  { name = 'Knife -> Ascent -> The Beast',                               weight = 5, endstage = LevelStage.STAGE8,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = false }
 }
 
 mod.state = {}
@@ -289,13 +297,19 @@ function mod:onNewRoom()
     elseif room:IsClear() then
       if mod.state.endingBoss.hush and mod:isMother() then -- re-enter mother room after clearing, and headed to hush
         mod:updateBlueWombTrapdoor() -- the game automatically makes this look like a regular trapdoor, update the sprite again
-      elseif mod.state.endingBoss.delirium and mod:isHush() then -- re-enter hush room after clearing
-        mod:spawnTheVoidDoor() -- doors have to be re-spawned every time
-      elseif room:IsCurrentRoomLastBoss() and mod:hasMoreStagesToGo() then -- re-enter boss room after clearing
-        if mod:shouldSpawnBlueWombDoor() then
-          mod:spawnBlueWombDoor(false)
-        elseif mod:shouldSpawnSecretExit() then
-          mod:spawnSecretExit(false) -- for whatever reason, trapdoors in secret exit rooms don't need to be spawned
+      else
+        if mod:hasMoreStagesToGo() then
+          if room:IsCurrentRoomLastBoss() then -- re-enter boss room after clearing
+            if mod:shouldSpawnBlueWombDoor() then
+              mod:spawnBlueWombDoor(false)
+            elseif mod:shouldSpawnSecretExit() then
+              mod:spawnSecretExit(false) -- for whatever reason, trapdoors in secret exit rooms don't need to be spawned
+            end
+          end
+        else -- no more stages to go
+          if mod.state.endingBoss.delirium and mod:isHush() then -- re-enter hush room after clearing
+            mod:spawnTheVoidDoor() -- doors have to be re-spawned every time
+          end
         end
       end
     end
@@ -362,14 +376,34 @@ function mod:onPreEntitySpawn(entityType, variant, subType, position, velocity, 
   end
 end
 
--- filtered to ENTITY_MOM
+-- filtered to ENTITY_MOM and ENTITY_MEGA_SATAN_2
 function mod:onNpcDeath(entityNpc)
   if not mod:isChallenge() then
     return
   end
   
-  if mod:isMom() then
-    mod.isMomDead = true
+  local room = game:GetRoom()
+  
+  if entityNpc.Type == EntityType.ENTITY_MOM then
+    if mod:isMom() then
+      mod.isMomDead = true
+    end
+  elseif entityNpc.Type == EntityType.ENTITY_MEGA_SATAN_2 then
+    if mod:isMegaSatan() and mod.state.endingBoss.delirium then
+      mod:spawnVoidPortal(room:GetGridPosition(157))
+      room:SetClear(true) -- this stops the cutscene from triggering
+      
+      -- we have to handle adding any charges
+      for i = 0, game:GetNumPlayers() - 1 do
+        local player = game:GetPlayer(i)
+        
+        for _, slot in ipairs({ ActiveSlot.SLOT_PRIMARY, ActiveSlot.SLOT_SECONDARY, ActiveSlot.SLOT_POCKET }) do -- SLOT_POCKET2
+          if player:NeedsCharge(slot) then
+            player:SetActiveCharge(player:GetActiveCharge(slot) + 1, slot)
+          end
+        end
+      end
+    end
   end
 end
 
@@ -899,6 +933,16 @@ function mod:isHush()
          roomDesc.GridIndex >= 0
 end
 
+function mod:isMegaSatan()
+  local level = game:GetLevel()
+  local room = level:GetCurrentRoom()
+  local roomDesc = level:GetCurrentRoomDesc()
+  
+  return level:GetStage() == LevelStage.STAGE6 and
+         room:GetType() == RoomType.ROOM_BOSS and
+         roomDesc.GridIndex == GridRooms.ROOM_MEGA_SATAN_IDX
+end
+
 function mod:isCurseOfTheLabyrinth()
   local level = game:GetLevel()
   local curses = level:GetCurses()
@@ -984,6 +1028,7 @@ mod:AddCallback(ModCallbacks.MC_POST_UPDATE, mod.onUpdate)
 mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.onRender)
 mod:AddCallback(ModCallbacks.MC_PRE_ENTITY_SPAWN, mod.onPreEntitySpawn)
 mod:AddCallback(ModCallbacks.MC_POST_NPC_DEATH, mod.onNpcDeath, EntityType.ENTITY_MOM)
+mod:AddCallback(ModCallbacks.MC_POST_NPC_DEATH, mod.onNpcDeath, EntityType.ENTITY_MEGA_SATAN_2)
 mod:AddCallback(ModCallbacks.MC_POST_PICKUP_INIT, mod.onPickupInit, PickupVariant.PICKUP_TROPHY)
 mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, mod.onPlayerInit, 0) -- 0 is player, 1 is co-op baby
 mod:AddCallback(ModCallbacks.MC_POST_PEFFECT_UPDATE, mod.onPeffectUpdate, PlayerType.PLAYER_ISAAC)
