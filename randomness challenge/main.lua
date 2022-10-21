@@ -443,6 +443,16 @@ function mod:onPickupInit(pickup)
   end
 end
 
+-- filtered to PICKUP_COLLECTIBLE
+function mod:onPickupUpdate(pickup)
+  if pickup.SubType == CollectibleType.COLLECTIBLE_POLAROID or pickup.SubType == CollectibleType.COLLECTIBLE_NEGATIVE then
+    if mod:isMom() and pickup.Price ~= 0 then -- can happen due to satanic bible
+      pickup.Price = 0
+      pickup.AutoUpdatePrice = false
+    end
+  end
+end
+
 -- filtered to 0-Player
 function mod:onPlayerInit(player)
   if not mod:isChallenge() then
@@ -1030,6 +1040,7 @@ mod:AddCallback(ModCallbacks.MC_PRE_ENTITY_SPAWN, mod.onPreEntitySpawn)
 mod:AddCallback(ModCallbacks.MC_POST_NPC_DEATH, mod.onNpcDeath, EntityType.ENTITY_MOM)
 mod:AddCallback(ModCallbacks.MC_POST_NPC_DEATH, mod.onNpcDeath, EntityType.ENTITY_MEGA_SATAN_2)
 mod:AddCallback(ModCallbacks.MC_POST_PICKUP_INIT, mod.onPickupInit, PickupVariant.PICKUP_TROPHY)
+mod:AddCallback(ModCallbacks.MC_POST_PICKUP_UPDATE, mod.onPickupUpdate, PickupVariant.PICKUP_COLLECTIBLE)
 mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, mod.onPlayerInit, 0) -- 0 is player, 1 is co-op baby
 mod:AddCallback(ModCallbacks.MC_POST_PEFFECT_UPDATE, mod.onPeffectUpdate, PlayerType.PLAYER_ISAAC)
 mod:AddCallback(ModCallbacks.MC_POST_PEFFECT_UPDATE, mod.onPeffectUpdate, PlayerType.PLAYER_LILITH)
