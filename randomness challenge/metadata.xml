@@ -20,15 +20,23 @@ There's over 50 paths, including:
     [*]Ascent -&gt; The Beast
 [/list]
 
+All paths are vanilla except for the paths that continue past Mother.
+
 You can tap the map button to show your path.
 
 Right now, trapdoors spawn in the center of the room rather than their normal positions. I might leave this or change it. I haven't made up my mind yet. I like that it feels a bit different.
 
 If relevant: The polaroid and negative aren't required. Knife pieces 1 and 2 are required. Key pieces 1 and 2 will be spawned at the start of your run.
 
-It's recommended to disable mods like [i]AlwaysVoid[/i] and [i]NO Mega Satan auto cutscene[/i] since those mods are enabled for custom challenges and could cause conflicts.
-
 I haven't seen a random Void portal show up in a custom challenge recently, but if one does then you can always choose to end your run by fighting Delirium.
+
+Potential mod conflicts:
+[list]
+    [*]Any mods that can override the chosen path like [i]Coin Flip (Path Randomizer)[/i] should be disabled when running this challenge.
+    [*]To make the Ascent paths work, I have to disable XL on 3-1 so any curse manager mods that force XL could cause a conflict.
+    [*]This mod implements runs continuing past Mega Satan just like [i]AlwaysVoid[/i] and [i]NO Mega Satan auto cutscene[/i]. It's recommended to disable those mods so you don't run into any conflicts.
+    [*]This mod implements runs continuing past Mother just like [i]Runs Continue Past Mother[/i]. That mod disables itself for custom challenges and should be fine to leave enabled.
+[/list]
 
 There's 6 challenges that are based around character selection...
 
@@ -151,7 +159,7 @@ Tainted Eden is even more random.
 [b][u]Randomness Challenge (Trainer)[/u][/b]
 
 This challenge starts you as Isaac with TMTRAINER. It's basically the DELETE THIS challenge with a custom path.</description>
-    <version>1.19</version>
+    <version>1.20</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
     <tag id="Challenges"/>
