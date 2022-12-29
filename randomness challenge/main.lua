@@ -400,7 +400,7 @@ function mod:onNpcDeath(entityNpc)
         
         for _, slot in ipairs({ ActiveSlot.SLOT_PRIMARY, ActiveSlot.SLOT_SECONDARY, ActiveSlot.SLOT_POCKET }) do -- SLOT_POCKET2
           if player:NeedsCharge(slot) then
-            player:SetActiveCharge(player:GetActiveCharge(slot) + 1, slot)
+            player:SetActiveCharge(player:GetActiveCharge(slot) + player:GetBatteryCharge(slot) + 1, slot)
           end
         end
       end

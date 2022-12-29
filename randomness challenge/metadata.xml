@@ -34,7 +34,7 @@ Potential mod conflicts:
 [list]
     [*]Any mods that can override the chosen path like [i]Coin Flip (Path Randomizer)[/i] should be disabled when running this challenge.
     [*]To make the Ascent paths work, I have to disable XL on 3-1 so any curse manager mods that force XL could cause a conflict.
-    [*]This mod implements runs continuing past Mega Satan just like [i]AlwaysVoid[/i] and [i]NO Mega Satan auto cutscene[/i]. It's recommended to disable those mods so you don't run into any conflicts.
+    [*]This mod implements runs continuing past Mega Satan just like [i]AlwaysVoid[/i], [i]NO Mega Satan auto cutscene[/i], and [i]No Auto-Cutscenes[/i]. It's recommended to disable those mods so you don't run into any conflicts.
     [*]This mod implements runs continuing past Mother just like [i]Runs Continue Past Mother[/i]. That mod disables itself for custom challenges and should be fine to leave enabled.
 [/list]
 
@@ -159,7 +159,7 @@ Tainted Eden is even more random.
 [b][u]Randomness Challenge (Trainer)[/u][/b]
 
 This challenge starts you as Isaac with TMTRAINER. It's basically the DELETE THIS challenge with a custom path.</description>
-    <version>1.20</version>
+    <version>1.21</version>
     <visibility>Public</visibility>
     <tag id="Lua"/>
     <tag id="Challenges"/>
