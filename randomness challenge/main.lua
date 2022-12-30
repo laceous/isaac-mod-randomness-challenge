@@ -875,7 +875,7 @@ function mod:isTakingTrapdoor()
     if sprite:IsPlaying('Trapdoor') then
       local gridEntity = room:GetGridEntity(playerIdx)
       if gridEntity and gridEntity:GetType() == GridEntityType.GRID_TRAPDOOR then
-        if gridEntity.VarData ~= 1 then -- exclude void portal
+        if gridEntity:GetVariant() ~= 1 then -- exclude void portal
           return true
         end
       end
