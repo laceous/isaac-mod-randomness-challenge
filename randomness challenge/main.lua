@@ -231,7 +231,7 @@ end
 -- this is important so we can get to the mausoleum for beast runs
 function mod:onCurseEval(curses)
   if not mod:isChallenge() then
-    return curses
+    return nil
   end
   
   local level = game:GetLevel()
@@ -240,11 +240,11 @@ function mod:onCurseEval(curses)
   if mod.state.endingBoss.endstage == LevelStage.STAGE8 and stage == LevelStage.STAGE3_1 then -- beast
     local curse = LevelCurse.CURSE_OF_LABYRINTH
     if curses & curse == curse then
-      curses = curses & ~curse -- remove curse of the labyrinth
+      return curses & ~curse -- remove curse of the labyrinth
     end
   end
   
-  return curses
+  return nil -- return nil if no changes are required
 end
 
 function mod:onNewLevel()
