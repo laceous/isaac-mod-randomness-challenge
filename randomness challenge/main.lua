@@ -10,6 +10,8 @@ mod.showNameAt = -1
 mod.rng = RNG()
 mod.rngShiftIndex = 35
 
+mod.isaacTemplate = { player = PlayerType.PLAYER_ISAAC, maxhp = 6, bonehp = 0, redhp = 6, soulhp = 0, blackhp = 0, item = nil, trinket = nil, keys = 0, bombs = 0, coins = 0, twin = nil }
+
 -- only include items that the game doesn't setup by default, usually these are unlockable items (+ hearts, keys, bombs, coins)
 -- hearts except for bone hearts require x2 for full hearts
 -- init: characters will get their default items if changed in init, some characters like jacob or tainted forgotten have issues being changed in init (crashes, buggy behavior, etc)
@@ -120,7 +122,7 @@ mod.endingBosses = {
 mod.state = {}
 mod.state.stageSeeds = {}
 mod.state.defaultNumKeys = 0
-mod.state.defaultNumBombs = 1 -- isaac normally starts with 1 bomb
+mod.state.defaultNumBombs = 0
 mod.state.defaultNumCoins = 0
 mod.state.endingBoss = { name = '', weight = 0, endstage = 0, altpath = false, secretpath = false, hush = false, megasatan = false, delirium = false }
 
@@ -208,13 +210,13 @@ function mod:onGameExit(shouldSave)
     mod:SaveData(json.encode(mod.state))
     mod:clearStageSeeds()
     mod.state.defaultNumKeys = 0
-    mod.state.defaultNumBombs = 1
+    mod.state.defaultNumBombs = 0
     mod.state.defaultNumCoins = 0
     mod:clearEndingBoss()
   else
     mod:clearStageSeeds()
     mod.state.defaultNumKeys = 0
-    mod.state.defaultNumBombs = 1
+    mod.state.defaultNumBombs = 0
     mod.state.defaultNumCoins = 0
     mod:clearEndingBoss()
     mod:SaveData(json.encode(mod.state))
@@ -460,8 +462,9 @@ function mod:onPlayerInit(player)
     return
   end
   
-  -- isaac is setup as the default template
-  if player:GetPlayerType() ~= PlayerType.PLAYER_ISAAC then
+  -- eden is setup as the default template, eden is excluded from the random options
+  -- not using isaac because it becomes a problem on continue
+  if player:GetPlayerType() ~= PlayerType.PLAYER_EDEN then
     return
   end
   
@@ -534,6 +537,7 @@ function mod:choosePlayerType(player, useRegularPlayerTypes, useTaintedPlayerTyp
     end
   else -- do it later
     -- certain characters have problems changing type in init
+    mod:changePlayerType(player, mod.isaacTemplate) -- switch eden to isaac so we don't get any random eden items
     mod.playerHash = GetPtrHash(player)
     mod.playerType = playerType
   end
