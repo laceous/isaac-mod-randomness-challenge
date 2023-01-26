@@ -198,6 +198,11 @@ function mod:onGameStart(isContinue)
     if mod.state.endingBoss.endstage == LevelStage.STAGE8 then -- beast
       game:SetStateFlag(GameStateFlag.STATE_BACKWARDS_PATH_INIT, true) -- no harm in setting this early
     end
+    
+    -- there's a small edge case if you use the clicker to change to eden and then quit/continue
+    -- this reruns onPlayerInit which would change you to another character again
+    local itemPool = game:GetItemPool()
+    itemPool:RemoveCollectible(CollectibleType.COLLECTIBLE_CLICKER)
   end
   
   mod.showNameAt = game:GetFrameCount() + 1
