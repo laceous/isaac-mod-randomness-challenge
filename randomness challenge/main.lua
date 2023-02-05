@@ -120,7 +120,6 @@ mod.endingBosses = {
 }
 
 mod.state = {}
-mod.state.stageSeeds = {}
 mod.state.defaultNumKeys = 0
 mod.state.defaultNumBombs = 0
 mod.state.defaultNumCoins = 0
@@ -131,12 +130,6 @@ function mod:onGameStart(isContinue)
     return
   end
   
-  local level = game:GetLevel()
-  local stage = level:GetStage()
-  local seeds = game:GetSeeds()
-  local stageSeed = seeds:GetStageSeed(stage)
-  mod:setStageSeed(stageSeed)
-  
   if isContinue then
     local die = false
     
@@ -144,8 +137,6 @@ function mod:onGameStart(isContinue)
       local _, state = pcall(json.decode, mod:LoadData())
       
       if type(state) == 'table' and
-         type(state.stageSeeds) == 'table' and
-         state.stageSeeds[tostring(stage)] == stageSeed and -- quick check to see if this is the same run being continued
          math.type(state.defaultNumKeys) == 'integer' and
          math.type(state.defaultNumBombs) == 'integer' and
          math.type(state.defaultNumCoins) == 'integer' and
@@ -159,11 +150,6 @@ function mod:onGameStart(isContinue)
          type(state.endingBoss.megasatan) == 'boolean' and
          type(state.endingBoss.delirium) == 'boolean'
       then
-        for key, value in pairs(state.stageSeeds) do
-          if type(key) == 'string' and math.type(value) == 'integer' then
-            mod.state.stageSeeds[key] = value
-          end
-        end
         mod.state.defaultNumKeys = state.defaultNumKeys
         mod.state.defaultNumBombs = state.defaultNumBombs
         mod.state.defaultNumCoins = state.defaultNumCoins
@@ -213,13 +199,11 @@ end
 function mod:onGameExit(shouldSave)
   if shouldSave then
     mod:SaveData(json.encode(mod.state))
-    mod:clearStageSeeds()
     mod.state.defaultNumKeys = 0
     mod.state.defaultNumBombs = 0
     mod.state.defaultNumCoins = 0
     mod:clearEndingBoss()
   else
-    mod:clearStageSeeds()
     mod.state.defaultNumKeys = 0
     mod.state.defaultNumBombs = 0
     mod.state.defaultNumCoins = 0
@@ -252,17 +236,6 @@ function mod:onCurseEval(curses)
   end
   
   return nil -- return nil if no changes are required
-end
-
-function mod:onNewLevel()
-  if not mod:isChallenge() then
-    return
-  end
-  
-  local level = game:GetLevel()
-  local seeds = game:GetSeeds()
-  local stageSeed = seeds:GetStageSeed(level:GetStage())
-  mod:setStageSeed(stageSeed)
 end
 
 function mod:onNewRoom()
@@ -980,17 +953,6 @@ function mod:seedRng()
   until(rand > 0)
 end
 
-function mod:setStageSeed(seed)
-  local level = game:GetLevel()
-  mod.state.stageSeeds[tostring(level:GetStage())] = seed
-end
-
-function mod:clearStageSeeds()
-  for key, _ in pairs(mod.state.stageSeeds) do
-    mod.state.stageSeeds[key] = nil
-  end
-end
-
 function mod:setEndingBoss(endingBoss)
   mod.state.endingBoss.name = endingBoss.name
   mod.state.endingBoss.weight = endingBoss.weight
@@ -1042,7 +1004,6 @@ mod:seedRng()
 mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, mod.onGameStart)
 mod:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, mod.onGameExit)
 mod:AddCallback(ModCallbacks.MC_POST_CURSE_EVAL, mod.onCurseEval)
-mod:AddCallback(ModCallbacks.MC_POST_NEW_LEVEL, mod.onNewLevel)
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.onNewRoom)
 mod:AddCallback(ModCallbacks.MC_POST_UPDATE, mod.onUpdate)
 mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.onRender)
