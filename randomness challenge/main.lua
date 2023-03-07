@@ -251,21 +251,23 @@ function mod:onNewRoom()
   local room = level:GetCurrentRoom()
   local roomDesc = level:GetCurrentRoomDesc()
   local stage = level:GetStage()
+  local currentDimension = mod:getCurrentDimension()
+  local isCurse = mod:isCurseOfTheLabyrinth()
   
   mod.isMomDead = false
   
   if level:IsAscent() then
-    if roomDesc.GridIndex == level:GetStartingRoomIndex() then
+    if roomDesc.GridIndex == level:GetStartingRoomIndex() and currentDimension == 0 then
       mod:spawnTrapdoor(room:GetCenterPos()) -- spawn heaven door during ascent
     end
   else -- not ascent
     if ( -- enter boss room after killing mausoleum heart
-         (stage == LevelStage.STAGE3_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE3_1)) and
+         (stage == LevelStage.STAGE3_2 or (isCurse and stage == LevelStage.STAGE3_1)) and
          mod:isRepentanceStageType() and room:IsCurrentRoomLastBoss() and
          game:GetStateFlag(GameStateFlag.STATE_MAUSOLEUM_HEART_KILLED)
        ) or
        ( -- enter blue woom
-         (stage == LevelStage.STAGE4_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE4_1)) and
+         (stage == LevelStage.STAGE4_2 or (isCurse and stage == LevelStage.STAGE4_1)) and
          roomDesc.GridIndex == GridRooms.ROOM_BLUE_WOOM_IDX
        ) or
        ( -- enter void room
@@ -273,7 +275,7 @@ function mod:onNewRoom()
        )
     then
       mod:spawnTrapdoor(room:GetCenterPos()) -- trapdoors will stick around
-    elseif mod.state.endingBoss.megasatan and stage == LevelStage.STAGE6 and roomDesc.GridIndex == level:GetStartingRoomIndex() then
+    elseif mod.state.endingBoss.megasatan and stage == LevelStage.STAGE6 and roomDesc.GridIndex == level:GetStartingRoomIndex() and currentDimension == 0 then
       mod:spawnMegaSatanRoomDoor() -- spawn mega satan door in first room
     elseif room:IsClear() then
       if mod.state.endingBoss.hush and mod:isMother() then -- re-enter mother room after clearing, and headed to hush
@@ -370,9 +372,14 @@ function mod:onNpcDeath(entityNpc)
       mod.isMomDead = true
     end
   elseif entityNpc.Type == EntityType.ENTITY_MEGA_SATAN_2 then
-    if mod:isMegaSatan() and mod.state.endingBoss.delirium then
-      mod:spawnVoidPortal(room:GetGridPosition(157))
+    if mod:isMegaSatan() then
       room:SetClear(true) -- this stops the cutscene from triggering
+      
+      if mod.state.endingBoss.delirium then
+        mod:spawnVoidPortal(room:GetGridPosition(157))
+      else
+        mod:spawnTrophy(room:GetGridPosition(157))
+      end
       
       -- we have to handle adding any charges
       for i = 0, game:GetNumPlayers() - 1 do
@@ -651,6 +658,7 @@ end
 function mod:shouldSpawnSecretExit()
   local level = game:GetLevel()
   local stage = level:GetStage()
+  local isCurse = mod:isCurseOfTheLabyrinth()
   
   return (
            mod.state.endingBoss.secretpath and
@@ -658,9 +666,9 @@ function mod:shouldSpawnSecretExit()
              (
                mod:isRepentanceStageType() and
                (
-                 (stage == LevelStage.STAGE1_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE1_1)) or
-                 (stage == LevelStage.STAGE2_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE2_1)) or
-                 ((stage == LevelStage.STAGE3_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE3_1)) and not game:GetStateFlag(GameStateFlag.STATE_BACKWARDS_PATH_INIT) and not game:GetStateFlag(GameStateFlag.STATE_MAUSOLEUM_HEART_KILLED))
+                 (stage == LevelStage.STAGE1_2 or (isCurse and stage == LevelStage.STAGE1_1)) or
+                 (stage == LevelStage.STAGE2_2 or (isCurse and stage == LevelStage.STAGE2_1)) or
+                 ((stage == LevelStage.STAGE3_2 or (isCurse and stage == LevelStage.STAGE3_1)) and not game:GetStateFlag(GameStateFlag.STATE_BACKWARDS_PATH_INIT) and not game:GetStateFlag(GameStateFlag.STATE_MAUSOLEUM_HEART_KILLED))
                )
              ) or
              (
@@ -668,7 +676,7 @@ function mod:shouldSpawnSecretExit()
                (
                  stage == LevelStage.STAGE1_1 or stage == LevelStage.STAGE1_2 or
                  stage == LevelStage.STAGE2_1 or stage == LevelStage.STAGE2_2 or
-                 (stage == LevelStage.STAGE3_1 and not mod:isCurseOfTheLabyrinth())
+                 (stage == LevelStage.STAGE3_1 and not isCurse)
                )
              )
            )
@@ -731,7 +739,16 @@ end
 
 function mod:spawnMegaSatanRoomDoor()
   local room = game:GetRoom()
-  room:TrySpawnMegaSatanRoomDoor(true)
+  if room:TrySpawnMegaSatanRoomDoor(true) then
+    local door = room:GetDoor(DoorSlot.UP0)
+    if door and door.TargetRoomIndex == GridRooms.ROOM_MEGA_SATAN_IDX then
+      if not (mod:hasCollectible(CollectibleType.COLLECTIBLE_KEY_PIECE_1) and mod:hasCollectible(CollectibleType.COLLECTIBLE_KEY_PIECE_2)) then -- does not have full key
+        local sprite = door:GetSprite()
+        door.State = DoorState.STATE_OPEN
+        sprite:Play('Opened')
+      end
+    end
+  end
 end
 
 -- spawn trapdoor or heaven door
@@ -740,6 +757,7 @@ function mod:spawnTrapdoor(position)
   local room = level:GetCurrentRoom()
   local roomDesc = level:GetCurrentRoomDesc()
   local stage = level:GetStage()
+  local isCurse = mod:isCurseOfTheLabyrinth()
   
   if level:IsAscent() or
      (
@@ -750,20 +768,20 @@ function mod:spawnTrapdoor(position)
          (
            mod:isRepentanceStageType() and
            (
-             ((stage == LevelStage.STAGE4_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE4_1)) and not mod.state.endingBoss.hush) or stage == LevelStage.STAGE4_3 or stage == LevelStage.STAGE5
+             ((stage == LevelStage.STAGE4_2 or (isCurse and stage == LevelStage.STAGE4_1)) and not mod.state.endingBoss.hush) or stage == LevelStage.STAGE4_3 or stage == LevelStage.STAGE5
            )
          ) or
          (
            not mod:isRepentanceStageType() and
            (
-             (stage == LevelStage.STAGE4_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE4_1)) or stage == LevelStage.STAGE4_3 or stage == LevelStage.STAGE5
+             (stage == LevelStage.STAGE4_2 or (isCurse and stage == LevelStage.STAGE4_1)) or stage == LevelStage.STAGE4_3 or stage == LevelStage.STAGE5
            )
          )
        )
      )
   then -- heaven door
     if #Isaac.FindByType(EntityType.ENTITY_EFFECT, EffectVariant.HEAVEN_LIGHT_DOOR, 0, false, false) == 0 then
-      Isaac.Spawn(EntityType.ENTITY_EFFECT, EffectVariant.HEAVEN_LIGHT_DOOR, 0, position, Vector(0,0), nil)
+      Isaac.Spawn(EntityType.ENTITY_EFFECT, EffectVariant.HEAVEN_LIGHT_DOOR, 0, position, Vector.Zero, nil)
     end
     if level:IsAscent() then
       local gridEntity = room:GetGridEntityFromPos(position)
@@ -783,6 +801,10 @@ function mod:spawnVoidPortal(position)
   local portal = Isaac.GridSpawn(GridEntityType.GRID_TRAPDOOR, 1, position, true)
   portal.VarData = 1
   portal:GetSprite():Load('gfx/grid/voidtrapdoor.anm2', true)
+end
+
+function mod:spawnTrophy(position)
+  Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_TROPHY, 0, position, Vector.Zero, nil)
 end
 
 function mod:updateBlueWombTrapdoor()
@@ -807,14 +829,15 @@ function mod:closeSecretExitTrapdoor()
   local room = level:GetCurrentRoom()
   local roomDesc = level:GetCurrentRoomDesc()
   local stage = level:GetStage()
+  local isCurse = mod:isCurseOfTheLabyrinth()
   
   if mod.state.endingBoss.secretpath and room:GetType() == RoomType.ROOM_SECRET_EXIT and roomDesc.GridIndex == GridRooms.ROOM_SECRET_EXIT_IDX and mod:isRepentanceStageType() and
      (
        (
-         (stage == LevelStage.STAGE1_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE1_1)) and not mod:hasCollectible(CollectibleType.COLLECTIBLE_KNIFE_PIECE_1)
+         (stage == LevelStage.STAGE1_2 or (isCurse and stage == LevelStage.STAGE1_1)) and not mod:hasCollectible(CollectibleType.COLLECTIBLE_KNIFE_PIECE_1)
        ) or
        (
-         (stage == LevelStage.STAGE2_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE2_1)) and not mod:hasCollectible(CollectibleType.COLLECTIBLE_KNIFE_PIECE_2)
+         (stage == LevelStage.STAGE2_2 or (isCurse and stage == LevelStage.STAGE2_1)) and not mod:hasCollectible(CollectibleType.COLLECTIBLE_KNIFE_PIECE_2)
        )
      )
   then
@@ -883,6 +906,27 @@ function mod:hasCollectible(collectible)
   end
   
   return false
+end
+
+function mod:getCurrentDimension()
+  local level = game:GetLevel()
+  return mod:getDimension(level:GetCurrentRoomDesc())
+end
+
+function mod:getDimension(roomDesc)
+  local level = game:GetLevel()
+  local ptrHash = GetPtrHash(roomDesc)
+  
+  -- 0: main dimension
+  -- 1: secondary dimension, used by downpour mirror dimension and mines escape sequence
+  -- 2: death certificate dimension
+  for i = 0, 2 do
+    if ptrHash == GetPtrHash(level:GetRoomByIdx(roomDesc.SafeGridIndex, i)) then
+      return i
+    end
+  end
+  
+  return -1
 end
 
 function mod:isRepentanceStageType()
