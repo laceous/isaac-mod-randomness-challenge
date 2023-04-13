@@ -6,7 +6,7 @@ mod.onGameStartHasRun = false
 mod.isMomDead = false
 mod.playerHash = nil
 mod.playerType = nil
-mod.showNameAt = -1
+mod.showName = false
 mod.rng = RNG()
 mod.rngShiftIndex = 35
 
@@ -191,7 +191,7 @@ function mod:onGameStart(isContinue)
     itemPool:RemoveCollectible(CollectibleType.COLLECTIBLE_CLICKER)
   end
   
-  mod.showNameAt = game:GetFrameCount() + 1
+  mod.showName = true
   mod.onGameStartHasRun = true
   mod:onNewRoom()
 end
@@ -215,27 +215,8 @@ function mod:onGameExit(shouldSave)
   mod.isMomDead = false
   mod.playerHash = nil
   mod.playerType = nil
-  mod.showNameAt = -1
+  mod.showName = false
   mod:seedRng()
-end
-
--- this is important so we can get to the mausoleum for beast runs
-function mod:onCurseEval(curses)
-  if not mod:isChallenge() then
-    return nil
-  end
-  
-  local level = game:GetLevel()
-  local stage = level:GetStage()
-  
-  if mod.state.endingBoss.endstage == LevelStage.STAGE8 and stage == LevelStage.STAGE3_1 then -- beast
-    local curse = LevelCurse.CURSE_OF_LABYRINTH
-    if curses & curse == curse then
-      return curses & ~curse -- remove curse of the labyrinth
-    end
-  end
-  
-  return nil -- return nil if no changes are required
 end
 
 function mod:onNewRoom()
@@ -259,6 +240,8 @@ function mod:onNewRoom()
   if level:IsAscent() then
     if roomDesc.GridIndex == level:GetStartingRoomIndex() and currentDimension == 0 then
       mod:spawnTrapdoor(room:GetCenterPos()) -- spawn heaven door during ascent
+    elseif not mod:isRepentanceStageType() and mod:isMom() then
+      mod:updateMausoleumTrapdoor() -- show mausoleum trapdoor sprite
     end
   else -- not ascent
     if ( -- enter boss room after killing mausoleum heart
@@ -278,21 +261,21 @@ function mod:onNewRoom()
     elseif mod.state.endingBoss.megasatan and stage == LevelStage.STAGE6 and roomDesc.GridIndex == level:GetStartingRoomIndex() and currentDimension == 0 then
       mod:spawnMegaSatanRoomDoor() -- spawn mega satan door in first room
     elseif room:IsClear() then
-      if mod.state.endingBoss.hush and mod:isMother() then -- re-enter mother room after clearing, and headed to hush
-        mod:updateBlueWombTrapdoor() -- the game automatically makes this look like a regular trapdoor, update the sprite again
-      else
-        if mod:hasMoreStagesToGo() then
-          if room:IsCurrentRoomLastBoss() then -- re-enter boss room after clearing
-            if mod:shouldSpawnBlueWombDoor() then
-              mod:spawnBlueWombDoor(false)
-            elseif mod:shouldSpawnSecretExit() then
-              mod:spawnSecretExit(false) -- for whatever reason, trapdoors in secret exit rooms don't need to be spawned
-            end
+      if mod:hasMoreStagesToGo() then
+        if mod.state.endingBoss.hush and mod:isMother() then -- re-enter mother room after clearing, and headed to hush
+          mod:updateBlueWombTrapdoor() -- the game automatically makes this look like a regular trapdoor, update the sprite again
+        elseif mod.state.endingBoss.endstage == LevelStage.STAGE8 and not mod:isRepentanceStageType() and mod:isMom() then
+          mod:updateMausoleumTrapdoor()
+        elseif room:IsCurrentRoomLastBoss() then -- re-enter boss room after clearing
+          if mod:shouldSpawnBlueWombDoor() then
+            mod:spawnBlueWombDoor(false)
+          elseif mod:shouldSpawnSecretExit() then
+            mod:spawnSecretExit(false) -- for whatever reason, trapdoors in secret exit rooms don't need to be spawned
           end
-        else -- no more stages to go
-          if mod.state.endingBoss.delirium and mod:isHush() then -- re-enter hush room after clearing
-            mod:spawnTheVoidDoor() -- doors have to be re-spawned every time
-          end
+        end
+      else -- no more stages to go
+        if mod.state.endingBoss.delirium and mod:isHush() then -- re-enter hush room after clearing
+          mod:spawnTheVoidDoor() -- doors have to be re-spawned every time
         end
       end
     end
@@ -309,10 +292,11 @@ function mod:onUpdate()
   
   mod:closeSecretExitTrapdoor()
   mod:updateCorpseStage()
+  mod:setSecretPath()
   
-  if game:GetFrameCount() == mod.showNameAt then
+  if mod.showName then
     hud:ShowItemText(level:GetName(), mod.state.endingBoss.name, false)
-    mod.showNameAt = -1
+    mod.showName = false
   end
 end
 
@@ -329,7 +313,7 @@ function mod:onRender()
   for i = 0, game:GetNumPlayers() - 1 do
     local player = game:GetPlayer(i)
     if Input.IsActionTriggered(ButtonAction.ACTION_MAP, player.ControllerIndex) then
-      mod.showNameAt = game:GetFrameCount() + 1
+      mod.showName = true
       break
     end
   end
@@ -680,9 +664,6 @@ function mod:shouldSpawnSecretExit()
                )
              )
            )
-         ) or
-         (
-           not mod.state.endingBoss.secretpath and mod.state.endingBoss.endstage == LevelStage.STAGE8 and not mod:isRepentanceStageType() and stage == LevelStage.STAGE3_1 -- not secret path and beast
          )
 end
 
@@ -793,6 +774,8 @@ function mod:spawnTrapdoor(position)
     local trapdoor = Isaac.GridSpawn(GridEntityType.GRID_TRAPDOOR, 0, position, true)
     if mod.state.endingBoss.hush and mod:isMother() then
       mod:setBlueWombholeSprite(trapdoor:GetSprite())
+    elseif mod.state.endingBoss.endstage == LevelStage.STAGE8 and not mod:isRepentanceStageType() and mod:isMom() then
+      mod:setMausoleumTrapdoorSprite(trapdoor:GetSprite())
     end
   end
 end
@@ -807,10 +790,24 @@ function mod:spawnTrophy(position)
   Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_TROPHY, 0, position, Vector.Zero, nil)
 end
 
+function mod:updateMausoleumTrapdoor()
+  local room = game:GetRoom()
+  
+  local trapdoor = room:GetGridEntityFromPos(room:GetCenterPos())
+  if trapdoor and trapdoor:GetType() == GridEntityType.GRID_TRAPDOOR then
+    mod:setMausoleumTrapdoorSprite(trapdoor:GetSprite())
+  end
+end
+
+function mod:setMausoleumTrapdoorSprite(sprite)
+  sprite:Load('gfx/grid/trapdoor_mausoleum.anm2', true)
+  --game:ShowHallucination(0, BackdropType.MAUSOLEUM_ENTRANCE)
+end
+
 function mod:updateBlueWombTrapdoor()
   local room = game:GetRoom()
   
-  local trapdoor = room:GetGridEntity(127)
+  local trapdoor = room:GetGridEntityFromPos(room:GetCenterPos())
   if trapdoor and trapdoor:GetType() == GridEntityType.GRID_TRAPDOOR then
     mod:setBlueWombholeSprite(trapdoor:GetSprite())
   end
@@ -841,7 +838,7 @@ function mod:closeSecretExitTrapdoor()
        )
      )
   then
-    local gridEntity = room:GetGridEntity(67) -- center of room
+    local gridEntity = room:GetGridEntityFromPos(room:GetCenterPos())
     if gridEntity and gridEntity:GetType() == GridEntityType.GRID_TRAPDOOR then
       gridEntity.State = 0                         -- closed
       gridEntity:GetSprite():SetFrame('Closed', 0) -- show closed state
@@ -869,25 +866,42 @@ function mod:updateCorpseStage()
   end
 end
 
-function mod:isTakingTrapdoor()
-  local room = game:GetRoom()
+-- TrySpawnSecretExit doesn't usually work here
+-- so re-using the normal trapdoor instead
+function mod:setSecretPath()
+  local level = game:GetLevel()
+  local stage = level:GetStage()
   
-  for i = 0, game:GetNumPlayers() - 1 do
-    local player = game:GetPlayer(i)
-    local playerIdx = room:GetGridIndex(player.Position)
-    local sprite = player:GetSprite()
+  if mod.state.endingBoss.endstage == LevelStage.STAGE8 and -- beast
+     not level:IsAscent() and not mod:isRepentanceStageType() and (stage == LevelStage.STAGE3_2 or (mod:isCurseOfTheLabyrinth() and stage == LevelStage.STAGE3_1)) and
+     mod:isTakingTrapdoor()
+  then
+    game:SetStateFlag(GameStateFlag.STATE_SECRET_PATH, true)
+    --game:SetStateFlag(GameStateFlag.STATE_BACKWARDS_PATH_INIT, true)
+  end
+end
+
+function mod:isTakingTrapdoor()
+  if game:IsPaused() then
+    local room = game:GetRoom()
     
-    if sprite:IsPlaying('Trapdoor') then
-      local gridEntity = room:GetGridEntity(playerIdx)
-      if gridEntity and gridEntity:GetType() == GridEntityType.GRID_TRAPDOOR then
-        if gridEntity:GetVariant() ~= 1 then -- exclude void portal
-          return true
+    for i = 0, game:GetNumPlayers() - 1 do
+      local player = game:GetPlayer(i)
+      local playerIdx = room:GetGridIndex(player.Position)
+      local sprite = player:GetSprite()
+      
+      if sprite:IsPlaying('Trapdoor') then
+        local gridEntity = room:GetGridEntity(playerIdx)
+        if gridEntity and gridEntity:GetType() == GridEntityType.GRID_TRAPDOOR then
+          if gridEntity:GetVariant() ~= 1 then -- exclude void portal
+            return true
+          end
         end
-      end
-    elseif sprite:IsPlaying('LightTravel') then
-      for _, entity in ipairs(Isaac.FindByType(EntityType.ENTITY_EFFECT, EffectVariant.HEAVEN_LIGHT_DOOR, 0, false, false)) do
-        if playerIdx == room:GetGridIndex(entity.Position) then
-          return true
+      elseif sprite:IsPlaying('LightTravel') then
+        for _, entity in ipairs(Isaac.FindByType(EntityType.ENTITY_EFFECT, EffectVariant.HEAVEN_LIGHT_DOOR, 0, false, false)) do
+          if playerIdx == room:GetGridIndex(entity.Position) then
+            return true
+          end
         end
       end
     end
@@ -1047,7 +1061,6 @@ end
 mod:seedRng()
 mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, mod.onGameStart)
 mod:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, mod.onGameExit)
-mod:AddCallback(ModCallbacks.MC_POST_CURSE_EVAL, mod.onCurseEval)
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.onNewRoom)
 mod:AddCallback(ModCallbacks.MC_POST_UPDATE, mod.onUpdate)
 mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.onRender)
