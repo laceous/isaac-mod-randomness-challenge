@@ -409,7 +409,7 @@ function mod:onPickupInit(pickup)
       elseif stage == LevelStage.STAGE6 then
         mod:spawnVoidPortal(pickup.Position) -- spawning a trapdoor here just replays the same floor
       else
-        mod:spawnTrapdoor(pickup.Position)
+        mod:spawnTrapdoor(pickup.Position) -- the game clears out this position so spawning the trapdoor here makes sense
       end
     end
   end
@@ -772,6 +772,12 @@ function mod:spawnTrapdoor(position)
     end
   else -- trapdoor
     local trapdoor = Isaac.GridSpawn(GridEntityType.GRID_TRAPDOOR, 0, position, true)
+    if trapdoor:GetType() ~= GridEntityType.GRID_TRAPDOOR then
+      room:RemoveGridEntity(room:GetGridIndex(position), 0, false)
+      room:Update()
+      trapdoor = Isaac.GridSpawn(GridEntityType.GRID_TRAPDOOR, 0, position, true)
+    end
+    
     if mod.state.endingBoss.hush and mod:isMother() then
       mod:setBlueWombholeSprite(trapdoor:GetSprite())
     elseif mod.state.endingBoss.endstage == LevelStage.STAGE8 and not mod:isRepentanceStageType() and mod:isMom() then
@@ -781,7 +787,15 @@ function mod:spawnTrapdoor(position)
 end
 
 function mod:spawnVoidPortal(position)
+  local room = game:GetRoom()
+  
   local portal = Isaac.GridSpawn(GridEntityType.GRID_TRAPDOOR, 1, position, true)
+  if portal:GetType() ~= GridEntityType.GRID_TRAPDOOR then
+    room:RemoveGridEntity(room:GetGridIndex(position), 0, false)
+    room:Update()
+    portal = Isaac.GridSpawn(GridEntityType.GRID_TRAPDOOR, 1, position, true)
+  end
+  
   portal.VarData = 1
   portal:GetSprite():Load('gfx/grid/voidtrapdoor.anm2', true)
 end
