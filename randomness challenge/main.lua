@@ -258,8 +258,12 @@ function mod:onNewRoom()
        )
     then
       mod:spawnTrapdoor(room:GetCenterPos()) -- trapdoors will stick around
-    elseif mod.state.endingBoss.megasatan and stage == LevelStage.STAGE6 and roomDesc.GridIndex == level:GetStartingRoomIndex() and currentDimension == 0 then
-      mod:spawnMegaSatanRoomDoor() -- spawn mega satan door in first room
+    elseif mod.state.endingBoss.megasatan and stage == LevelStage.STAGE6 then
+      if roomDesc.GridIndex == level:GetStartingRoomIndex() and currentDimension == 0 then
+        mod:spawnMegaSatanRoomDoor() -- spawn mega satan door in first room
+      elseif roomDesc.GridIndex == GridRooms.ROOM_MEGA_SATAN_IDX and room:IsClear() then
+        mod:spawnMegaSatanDoorExit()
+      end
     elseif room:IsClear() then
       if mod:hasMoreStagesToGo() then
         if mod.state.endingBoss.hush and mod:isMother() then -- re-enter mother room after clearing, and headed to hush
@@ -343,39 +347,34 @@ function mod:onPreEntitySpawn(entityType, variant, subType, position, velocity, 
   end
 end
 
--- filtered to ENTITY_MOM and ENTITY_MEGA_SATAN_2
+function mod:onPreSpawnAward()
+  if not mod:isChallenge() then
+    return
+  end
+  
+  if mod:isMegaSatan() then
+    local room = game:GetRoom()
+    
+    if mod.state.endingBoss.delirium then
+      mod:spawnVoidPortal(room:GetGridPosition(157))
+    else
+      mod:spawnTrophy(room:GetGridPosition(157))
+    end
+    
+    mod:spawnMegaSatanDoorExit()
+    
+    return true
+  end
+end
+
+-- filtered to ENTITY_MOM
 function mod:onNpcDeath(entityNpc)
   if not mod:isChallenge() then
     return
   end
   
-  local room = game:GetRoom()
-  
-  if entityNpc.Type == EntityType.ENTITY_MOM then
-    if mod:isMom() then
-      mod.isMomDead = true
-    end
-  elseif entityNpc.Type == EntityType.ENTITY_MEGA_SATAN_2 then
-    if mod:isMegaSatan() then
-      room:SetClear(true) -- this stops the cutscene from triggering
-      
-      if mod.state.endingBoss.delirium then
-        mod:spawnVoidPortal(room:GetGridPosition(157))
-      else
-        mod:spawnTrophy(room:GetGridPosition(157))
-      end
-      
-      -- we have to handle adding any charges
-      for i = 0, game:GetNumPlayers() - 1 do
-        local player = game:GetPlayer(i)
-        
-        for _, slot in ipairs({ ActiveSlot.SLOT_PRIMARY, ActiveSlot.SLOT_SECONDARY, ActiveSlot.SLOT_POCKET }) do -- SLOT_POCKET2
-          if player:NeedsCharge(slot) then
-            player:SetActiveCharge(player:GetActiveCharge(slot) + player:GetBatteryCharge(slot) + 1, slot)
-          end
-        end
-      end
-    end
+  if mod:isMom() then
+    mod.isMomDead = true
   end
 end
 
@@ -732,6 +731,21 @@ function mod:spawnMegaSatanRoomDoor()
   end
 end
 
+function mod:spawnMegaSatanDoorExit()
+  local level = game:GetLevel()
+  local room = level:GetCurrentRoom()
+  if room:GetDoor(DoorSlot.DOWN0) == nil and room:TrySpawnBlueWombDoor(false, true, true) then
+    local door = room:GetDoor(DoorSlot.DOWN0)
+    if door then
+      local sprite = door:GetSprite()
+      door.TargetRoomType = RoomType.ROOM_DEFAULT
+      door.TargetRoomIndex = level:GetPreviousRoomIndex() -- GetStartingRoomIndex
+      sprite:Load('gfx/grid/door_24_megasatandoor.anm2', true)
+      sprite:Play('Opened', true)
+    end
+  end
+end
+
 -- spawn trapdoor or heaven door
 function mod:spawnTrapdoor(position)
   local level = game:GetLevel()
@@ -1079,8 +1093,8 @@ mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.onNewRoom)
 mod:AddCallback(ModCallbacks.MC_POST_UPDATE, mod.onUpdate)
 mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.onRender)
 mod:AddCallback(ModCallbacks.MC_PRE_ENTITY_SPAWN, mod.onPreEntitySpawn)
+mod:AddCallback(ModCallbacks.MC_PRE_SPAWN_CLEAN_AWARD, mod.onPreSpawnAward)
 mod:AddCallback(ModCallbacks.MC_POST_NPC_DEATH, mod.onNpcDeath, EntityType.ENTITY_MOM)
-mod:AddCallback(ModCallbacks.MC_POST_NPC_DEATH, mod.onNpcDeath, EntityType.ENTITY_MEGA_SATAN_2)
 mod:AddCallback(ModCallbacks.MC_POST_PICKUP_INIT, mod.onPickupInit, PickupVariant.PICKUP_TROPHY)
 mod:AddCallback(ModCallbacks.MC_POST_PICKUP_UPDATE, mod.onPickupUpdate, PickupVariant.PICKUP_COLLECTIBLE)
 mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, mod.onPlayerInit, 0) -- 0 is player, 1 is co-op baby
