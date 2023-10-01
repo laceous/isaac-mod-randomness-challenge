@@ -1,6 +1,7 @@
 local mod = RegisterMod('Randomness Challenge', 1)
 local json = require('json')
 local game = Game()
+local sfx = SFXManager()
 
 mod.onGameStartHasRun = false
 mod.isMomDead = false
@@ -119,6 +120,39 @@ mod.endingBosses = {
   { name = 'Knife -> Ascent -> The Beast',                               weight = 5, endstage = LevelStage.STAGE8,   altpath = false, secretpath = true,  hush = false, megasatan = false, delirium = false }
 }
 
+mod.backdropTypes = {
+  BackdropType.BASEMENT,
+  BackdropType.CELLAR,
+  BackdropType.BURNT_BASEMENT,
+  BackdropType.CAVES,
+  BackdropType.CATACOMBS,
+  BackdropType.FLOODED_CAVES,
+  BackdropType.DEPTHS,
+  BackdropType.NECROPOLIS,
+  BackdropType.DANK_DEPTHS,
+  BackdropType.WOMB,
+  BackdropType.UTERO,
+  BackdropType.SCARRED_WOMB,
+  BackdropType.BLUE_WOMB,
+  BackdropType.SHEOL,
+  BackdropType.CATHEDRAL,
+  BackdropType.DARKROOM,
+  BackdropType.CHEST,
+  BackdropType.DOWNPOUR,
+  BackdropType.MINES,
+  BackdropType.MAUSOLEUM,
+  BackdropType.CORPSE,
+  BackdropType.MAUSOLEUM2,
+  BackdropType.MAUSOLEUM3,
+  BackdropType.MAUSOLEUM4,
+  BackdropType.CORPSE2,
+  BackdropType.CORPSE3,
+  BackdropType.DROSS,
+  BackdropType.ASHPIT,
+  BackdropType.GEHENNA,
+  BackdropType.MORTIS,
+}
+
 mod.state = {}
 mod.state.defaultNumKeys = 0
 mod.state.defaultNumBombs = 0
@@ -226,6 +260,10 @@ function mod:onNewRoom()
   
   if not mod.onGameStartHasRun then
     return
+  end
+  
+  if mod:isTrainerChallenge() then
+    mod:changeBackdropType()
   end
   
   local level = game:GetLevel()
@@ -950,6 +988,34 @@ function mod:hasCollectible(collectible)
   return false
 end
 
+function mod:changeBackdropType()
+  local seeds = game:GetSeeds()
+  local level = game:GetLevel()
+  local room = level:GetCurrentRoom()
+  local stage = level:GetStage()
+  if mod:isRepentanceStageType() then
+    stage = stage + 1
+  end
+  
+  if mod:tblHasVal(mod.backdropTypes, room:GetBackdropType()) and room:GetType() ~= RoomType.ROOM_DEVIL and room:GetType() ~= RoomType.ROOM_ANGEL then
+    local rng = RNG()
+    rng:SetSeed(seeds:GetStageSeed(stage), mod.rngShiftIndex) -- room:GetDecorationSeed
+    
+    game:ShowHallucination(0, mod.backdropTypes[rng:RandomInt(#mod.backdropTypes) + 1])
+    sfx:Stop(SoundEffect.SOUND_DEATH_CARD)
+  end
+end
+
+function mod:tblHasVal(tbl, val)
+  for _, v in ipairs(tbl) do
+    if v == val then
+      return true
+    end
+  end
+  
+  return false
+end
+
 function mod:getCurrentDimension()
   local level = game:GetLevel()
   return mod:getDimension(level:GetCurrentRoomDesc())
@@ -1084,6 +1150,11 @@ end
 function mod:isTaintedChallenge()
   local challenge = Isaac.GetChallenge()
   return challenge == Isaac.GetChallengeIdByName('Randomness Challenge (Tainted)')
+end
+
+function mod:isTrainerChallenge()
+  local challenge = Isaac.GetChallenge()
+  return challenge == Isaac.GetChallengeIdByName('Randomness Challenge (Trainer)')
 end
 
 mod:seedRng()
