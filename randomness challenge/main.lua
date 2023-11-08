@@ -993,13 +993,14 @@ function mod:changeBackdropType()
   local level = game:GetLevel()
   local room = level:GetCurrentRoom()
   local stage = level:GetStage()
-  if mod:isRepentanceStageType() then
-    stage = stage + 1
-  end
   
   if mod:tblHasVal(mod.backdropTypes, room:GetBackdropType()) and room:GetType() ~= RoomType.ROOM_DEVIL and room:GetType() ~= RoomType.ROOM_ANGEL then
     local rng = RNG()
-    rng:SetSeed(seeds:GetStageSeed(stage), mod.rngShiftIndex) -- room:GetDecorationSeed
+    if stage == LevelStage.STAGE7 then -- the void
+      rng:SetSeed(room:GetDecorationSeed(), mod.rngShiftIndex)
+    else
+      rng:SetSeed(seeds:GetStageSeed(mod:isRepentanceStageType() and stage + 1 or stage), mod.rngShiftIndex)
+    end
     
     game:ShowHallucination(0, mod.backdropTypes[rng:RandomInt(#mod.backdropTypes) + 1])
     sfx:Stop(SoundEffect.SOUND_DEATH_CARD)
