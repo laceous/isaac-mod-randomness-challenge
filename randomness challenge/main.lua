@@ -819,14 +819,13 @@ function mod:spawnTrapdoor(position)
     if level:IsAscent() then
       local gridEntity = room:GetGridEntityFromPos(position)
       if gridEntity and gridEntity:GetType() == GridEntityType.GRID_SPIDERWEB then
-        room:RemoveGridEntity(gridEntity:GetGridIndex(), 0, false)
+        mod:removeGridEntity(gridEntity:GetGridIndex(), 0, false, false)
       end
     end
   else -- trapdoor
     local trapdoor = Isaac.GridSpawn(GridEntityType.GRID_TRAPDOOR, 0, position, true)
     if trapdoor:GetType() ~= GridEntityType.GRID_TRAPDOOR then
-      room:RemoveGridEntity(room:GetGridIndex(position), 0, false)
-      room:Update()
+      mod:removeGridEntity(room:GetGridIndex(position), 0, false, true)
       trapdoor = Isaac.GridSpawn(GridEntityType.GRID_TRAPDOOR, 0, position, true)
     end
     
@@ -843,13 +842,25 @@ function mod:spawnVoidPortal(position)
   
   local portal = Isaac.GridSpawn(GridEntityType.GRID_TRAPDOOR, 1, position, true)
   if portal:GetType() ~= GridEntityType.GRID_TRAPDOOR then
-    room:RemoveGridEntity(room:GetGridIndex(position), 0, false)
-    room:Update()
+    mod:removeGridEntity(room:GetGridIndex(position), 0, false, true)
     portal = Isaac.GridSpawn(GridEntityType.GRID_TRAPDOOR, 1, position, true)
   end
   
   portal.VarData = 1
   portal:GetSprite():Load('gfx/grid/voidtrapdoor.anm2', true)
+end
+
+function mod:removeGridEntity(gridIdx, pathTrail, keepDecoration, update)
+  local room = game:GetRoom()
+  
+  if REPENTOGON then
+    room:RemoveGridEntityImmediate(gridIdx, pathTrail, keepDecoration)
+  else
+    room:RemoveGridEntity(gridIdx, pathTrail, keepDecoration)
+    if update then
+      room:Update()
+    end
+  end
 end
 
 function mod:spawnTrophy(position)
