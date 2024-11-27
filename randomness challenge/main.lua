@@ -8,6 +8,7 @@ mod.isMomDead = false
 mod.playerHash = nil
 mod.playerType = nil
 mod.showName = false
+mod.morphPolaroid = false
 mod.rng = RNG()
 mod.rngShiftIndex = 35
 
@@ -250,6 +251,7 @@ function mod:onGameExit(shouldSave)
   mod.playerHash = nil
   mod.playerType = nil
   mod.showName = false
+  mod.morphPolaroid = false
   mod:seedRng()
 end
 
@@ -376,6 +378,8 @@ function mod:onPreEntitySpawn(entityType, variant, subType, position, velocity, 
     mod.isMomDead = false
     
     if mod.state.endingBoss.endstage == LevelStage.STAGE5 or mod.state.endingBoss.endstage == LevelStage.STAGE6 then
+      mod.morphPolaroid = true
+      
       if mod.state.endingBoss.altpath then
         return { entityType, variant, CollectibleType.COLLECTIBLE_POLAROID, seed } -- isaac/blue baby
       else -- not altpath
@@ -416,37 +420,46 @@ function mod:onNpcDeath(entityNpc)
   end
 end
 
--- filtered to PICKUP_TROPHY
+-- filtered to PICKUP_TROPHY and PICKUP_COLLECTIBLE
 function mod:onPickupInit(pickup)
   if not mod:isChallenge() then
     return
   end
   
-  local level = game:GetLevel()
-  local room = level:GetCurrentRoom()
-  local roomDesc = level:GetCurrentRoomDesc()
-  local stage = level:GetStage()
-  
-  if (room:IsCurrentRoomLastBoss() or mod:isMother() or mod:isHush()) and stage ~= LevelStage.STAGE7 then -- does not include mega satan, exclude the void
-    if mod.state.endingBoss.megasatan and stage == LevelStage.STAGE6 and room:GetType() == RoomType.ROOM_BOSS and roomDesc.GridIndex >= 0 then -- remove trophy from normal boss
-      pickup:Remove()
-    elseif mod.state.endingBoss.delirium and stage >= mod.state.endingBoss.endstage then -- at or past the ending stage (not counting the void)
-      pickup:Remove()
-      if mod:isHush() then
-        mod:spawnTheVoidDoor()
-      else
-        mod:spawnVoidPortal(pickup.Position)
+  if pickup.Variant == PickupVariant.PICKUP_TROPHY then
+    local level = game:GetLevel()
+    local room = level:GetCurrentRoom()
+    local roomDesc = level:GetCurrentRoomDesc()
+    local stage = level:GetStage()
+    
+    if (room:IsCurrentRoomLastBoss() or mod:isMother() or mod:isHush()) and stage ~= LevelStage.STAGE7 then -- does not include mega satan, exclude the void
+      if mod.state.endingBoss.megasatan and stage == LevelStage.STAGE6 and room:GetType() == RoomType.ROOM_BOSS and roomDesc.GridIndex >= 0 then -- remove trophy from normal boss
+        pickup:Remove()
+      elseif mod.state.endingBoss.delirium and stage >= mod.state.endingBoss.endstage then -- at or past the ending stage (not counting the void)
+        pickup:Remove()
+        if mod:isHush() then
+          mod:spawnTheVoidDoor()
+        else
+          mod:spawnVoidPortal(pickup.Position)
+        end
+      elseif mod:hasMoreStagesToGo() then
+        pickup:Remove()
+        if mod:shouldSpawnBlueWombDoor() then
+          mod:spawnBlueWombDoor(true)
+        elseif mod:shouldSpawnSecretExit() then
+          mod:spawnSecretExit(true)
+        elseif stage == LevelStage.STAGE6 then
+          mod:spawnVoidPortal(pickup.Position) -- spawning a trapdoor here just replays the same floor
+        else
+          mod:spawnTrapdoor(pickup.Position) -- the game clears out this position so spawning the trapdoor here makes sense
+        end
       end
-    elseif mod:hasMoreStagesToGo() then
-      pickup:Remove()
-      if mod:shouldSpawnBlueWombDoor() then
-        mod:spawnBlueWombDoor(true)
-      elseif mod:shouldSpawnSecretExit() then
-        mod:spawnSecretExit(true)
-      elseif stage == LevelStage.STAGE6 then
-        mod:spawnVoidPortal(pickup.Position) -- spawning a trapdoor here just replays the same floor
-      else
-        mod:spawnTrapdoor(pickup.Position) -- the game clears out this position so spawning the trapdoor here makes sense
+    end
+  elseif pickup.Variant == PickupVariant.PICKUP_COLLECTIBLE then
+    if pickup.SubType == CollectibleType.COLLECTIBLE_POLAROID or pickup.SubType == CollectibleType.COLLECTIBLE_NEGATIVE then
+      if mod:isMom() and mod.morphPolaroid then
+        mod.morphPolaroid = false
+        pickup:Morph(pickup.Type, pickup.Variant, pickup.SubType, true, true, true) -- don't cycle polaroid/negative for tainted isaac
       end
     end
   end
@@ -454,6 +467,10 @@ end
 
 -- filtered to PICKUP_COLLECTIBLE
 function mod:onPickupUpdate(pickup)
+  if not mod:isChallenge() then
+    return
+  end
+  
   if pickup.SubType == CollectibleType.COLLECTIBLE_POLAROID or pickup.SubType == CollectibleType.COLLECTIBLE_NEGATIVE then
     if mod:isMom() and pickup.Price ~= 0 then -- can happen due to satanic bible
       pickup.Price = 0
@@ -1179,6 +1196,7 @@ mod:AddCallback(ModCallbacks.MC_PRE_ENTITY_SPAWN, mod.onPreEntitySpawn)
 mod:AddCallback(ModCallbacks.MC_PRE_SPAWN_CLEAN_AWARD, mod.onPreSpawnAward)
 mod:AddCallback(ModCallbacks.MC_POST_NPC_DEATH, mod.onNpcDeath, EntityType.ENTITY_MOM)
 mod:AddCallback(ModCallbacks.MC_POST_PICKUP_INIT, mod.onPickupInit, PickupVariant.PICKUP_TROPHY)
+mod:AddCallback(ModCallbacks.MC_POST_PICKUP_INIT, mod.onPickupInit, PickupVariant.PICKUP_COLLECTIBLE)
 mod:AddCallback(ModCallbacks.MC_POST_PICKUP_UPDATE, mod.onPickupUpdate, PickupVariant.PICKUP_COLLECTIBLE)
 mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, mod.onPlayerInit, 0) -- 0 is player, 1 is co-op baby
 mod:AddCallback(ModCallbacks.MC_POST_PEFFECT_UPDATE, mod.onPeffectUpdate, PlayerType.PLAYER_ISAAC)
